@@ -26,8 +26,8 @@ def make_sphere_2d(dx):
 
 
 class CollapsingCylinderGeometry():
-    def __init__(self, nCylinder_layers = 6, hdx = 1.0):
-        self.container_mass = 15.0 # arbitrarily chosen
+    def __init__(self, nCylinder_layers = 6, hdx = 0.5):
+        self.container_rho = 15.0 # arbitrarily chosen
         self.hdx = hdx
         self.nCylinder_layers = nCylinder_layers
 
@@ -40,34 +40,29 @@ class CollapsingCylinderGeometry():
 
     def create_particles(self):
         # create Container
-        n = 100
-        # left face
-        lx, ly, lz = numpy.mgrid[0:0:1j*n,0:26:1j*n,0:1:1j]
-        # bottom face
-        bx, by, bz = numpy.mgrid[0:26:1j*n,0:0:1j*n,0:1:1j]
-        # right face
-        rx, ry, rz = numpy.mgrid[26:26:1j*n,0:26:1j*n,0:1:1j]
+        nx, ny = 500, 500
+        dx = 1.0 / (nx -1)
+
+        x, y, z = numpy.mgrid[-1:27:nx*1j, -1:27:ny*1j, 0:1:1j]
+
+        interior = ((x > 0) & (x < 26)) & (y > 0) 
+        container = numpy.logical_not(interior)
+        x = x[container].flat
+        y = y[container].flat
+        z = z[container].flat
         
-        x = numpy.concatenate((lx,bx,rx))
-        y = numpy.concatenate((ly,by,ry))
-        z = numpy.concatenate((lz,bz,rz))
-        
-        x = x.flat
-        y = y.flat
-        z = z.flat
-        
-        container_m = numpy.ones_like(x) * self.container_mass / (3*n)
-        container_hdx = numpy.ones_like(x) * self.hdx / (n-1)
+        container_m = numpy.ones_like(x) * self.container_rho * dx * dx 
+        container_h = numpy.ones_like(x) * self.hdx * dx
         
         container = get_particle_array_rigid_body(name = 'container' , x = x, 
-                      y = y , z = z , m = container_m, hdx = container_hdx )
+                      y = y , z = z , m = container_m, h = container_h )
 
         container.total_mass[0] = numpy.sum(container_m)
         
         # Create Cylinder Arrays
         
         r = 0.5
-        nx , ny = 10 , 10
+        nx , ny = 15 , 15
         dx = 1.0 / (nx - 1)
 
         _x, _y, _z = make_sphere_2d(dx)
@@ -78,7 +73,7 @@ class CollapsingCylinderGeometry():
         for layer in range(self.nCylinder_layers):
             yc = layer + r
             if layer % 2 == 0:
-                for i in range(6):
+                for i in range(1):
                     xc = i + r
                     disp.append((xc, yc, 0.0))
             else:
@@ -99,10 +94,10 @@ class CollapsingCylinderGeometry():
         z = numpy.concatenate(z)
         body_id = numpy.concatenate(body_id)
         m = numpy.ones_like(x) * self.sphere_mass(n_sphere_particles)
-        hdx = numpy.ones_like(x) * self.hdx * 1.0 / (n_sphere_particles - 1)
+        h = numpy.ones_like(x) * self.hdx * 1.0 / (n_sphere_particles - 1)
 
         cylinder = get_particle_array_rigid_body(name='cylinder', x=x, y=y,
-                        z=z, m=m, hdx=hdx, body_id=body_id )
+                        z=z, m=m, h=h, body_id=body_id )
 
         return [cylinder, container]
 
