@@ -219,7 +219,7 @@
   \begin{frame} % slide 13
   \frametitle{Validation of RigidBodyCollision model}
   	\begin{itemize}
-  	 \item Test Cases: Zhang et.al\footnotemark ~ performed experimental studies to validate a coupled Finite Volume Particle (FVP) DEM to simulate interactions between fluids and solid bodies \footnotetext{ Zhang et.al, Simulation of solid-fluid mixture flow using moving particle methods, J. Comput.Phys. 228 (2009) 25522565, http://dx.doi.org/10.1016/j.jcp.2008.12.005}
+  	 \item Test Cases: Zhang et.al\footnotemark ~ performed experimental studies to validate a coupled Finite Volume Particle (FVP) DEM model to simulate interactions between fluids and solid bodies \footnotetext{ Zhang et.al, Simulation of solid-fluid mixture flow using moving particle methods, J. Comput.Phys. 228 (2009) 25522565, http://dx.doi.org/10.1016/j.jcp.2008.12.005}
  	   \begin{figure}
  	   \centering{\includegraphics[scale=0.18]{exp_setup.png}} 
  	   \caption{Experimental Setup}
@@ -234,7 +234,7 @@
   \frametitle{Validation of RigidBodyCollision model: Expected Profiles} 
   	  \begin{figure}
  	   \centering{\includegraphics[scale=0.3]{sysEvol.png}}
- 	   \caption{Evolution of the system at various times (6 Cylinder stack)}
+ 	   \caption{Observed Evolution of the system in time (6 Cylinder stack)}
  	   \end{figure}
   \end{frame}
  
@@ -269,7 +269,7 @@
  \end{frame}
   
  \begin{frame} % slide 17
-  \frametitle{Making RogidBodyCollision model Physically Consistent}
+  \frametitle{Making RigidBodyCollision model Physically Consistent}
   \begin{itemize}
    \item Current Model implements a simple Linear Spring and Dashpot Collision Model \pause
    \item Canelas,et.al.\footnotemark  implemented a Modified, Non-Linear Hertzian model in their recently published work (Feb 2016)
@@ -289,12 +289,9 @@
 
  \begin{frame} %slide 19
   \frametitle{Thank you!}
-
   \begin{center}
     \large{Questions?}   
-  \end{center}    
-  
+  \end{center}
  \end{frame}
-
-
+ 
 \end{document}
