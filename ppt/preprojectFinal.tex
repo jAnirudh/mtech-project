@@ -146,8 +146,8 @@
  \begin{frame} %slide 8
   \frametitle{The Discrete Element Method}
   \begin{itemize}
-   \item It is a numerical scheme which allows finite rotations and displacements of discrete bodies
-   \item The bodies interact with their nearest neighbours through Contact Laws; the interactions create new or destroy earlier contacts.
+   \item It is a numerical scheme which allows finite rotations and displacements of discrete bodies \pause
+   \item The bodies interact with their nearest neighbours through Contact Laws; the interactions create new or destroy earlier contacts. \pause
    \item {\bf{Soft Contact}} Method
    \begin{itemize}
     \item The bodies are allowed to ``overlap''
@@ -165,13 +165,13 @@
   \begin{itemize}
    \item Contact Search: The procedure of keeping track of the bodies that are in contact with a given body in a time-step
    \item Boxing: Time saving mechanism wherein the working area is divided into squares/cubes (for 2D or 3D)
-  \end{itemize}
+  \end{itemize}\pause
   \item Calculation of Contact Force
   \begin{itemize}
    \item Ascertain if contact is present
    \item Calculate the amount of overlap
    \item Use the overlap in the contact model and compute the contact force
-  \end{itemize}
+  \end{itemize}\pause
   \item Since the bodies are represented as collections of particles in pySPH, explicit Boxing and Contact Search is not needed
   \item the NNPS keeps track of all those elements which are in contact and the smoothing length effectively computes the amount of overlap  
  \end{itemize}
@@ -205,44 +205,87 @@
   \end{itemize}
  \end{frame}
  
-%  \begin{frame} % slide 12
-%  \frametitle{Prospective Projects}
-%  	\textbf{2. An Object Oriented Design for 3D Boundary Collisions}
-%  	\begin{itemize}
-%  		\item Work suggested by Dr. Prabhu Ramachandran \pause 
-%  		\item Roadblocks in the DSMC and pySPH front \pause
-%  		\begin{itemize}
-%  		 \item Unavoidable Commitments for Prof. Ramachandran
-%  		 \item Absolute zero functionality of the pySPH framework in terms of DSMC
-%  		 \item Constraints of working remotely and communicating effectively
-%  		\end{itemize}\pause
-%  		\item Project Description:\\ To develop a mechanism by which particle collisions with boundary surfaces can be detected. Also develop a mechanism to estimate the position of the particle after collision. \pause
-%  		\item Project Outcomes:
-%  		 \begin{itemize}
-%  		  \item pySPH will have capability to simulate particle collisions within objects of arbitrary shapes.
-%  		  \item Work with test driven software development. 
-%  		 \end{itemize} \pause
-%  		 \item Software Tools : Python and pySPH
-%  	\end{itemize}
-% \end{frame}
-%
-%  \begin{frame} % slide 13
-%  \frametitle{Ending Thoughts}
-%  	\begin{itemize}
-%  	 \item Worst Case Scenario \pause
-%  	  \begin{itemize}
-%  	  	\item Continue with 3D Boundary Collisions Problem
-%  	 	\item Shift to an Incompressible Flow Problem to solve using SPH in pySPH \pause
-%  	  \end{itemize}
-%  	 \item Best Case Scenario \pause
-%  	  \begin{itemize}
-%  	  	\item Work on the Gas Turbine and Rocket Engine Combustor problem in IITB \\\pause
-%  		      Work on DSMC and pySPH in my spare time ( not as part of the MTech Project )  
-%  	  \end{itemize}
-%    \end{itemize}
-%  \end{frame}
+  \begin{frame} % slide 12
+  \frametitle{Newton's Equations for Rigid Body Dynamics}
+    Rigid Body {\it{``I''}} = $\left\lbrace particles : r_{ij} = 0, ~ \forall t , i,j \in I\right\rbrace$ \pause \\
+     $$ M_{I}\frac{d{\it{{\bf{V_I}}}}}{dt} = \sum_{k~\in~I} m_{k} \frac{d{\it{{\bf{v_k}}}}}{dt}$$ \\
+    $${\bf{\it{I_I}}} \frac{d{\bf{\varOmega _{I}}}}{dt} = \sum_{k~\in~I} m_{k}\left( {\bf{r_k - R_I}}\right) \times \frac{d{\it{{\bf{v_k}}}}}{dt}$$ \\
+    ~~~~where, \\
+    ~~~~~~$M_I , {\it{\bf{V_I}}}, {\it{\bf{R_I}}} = $ Mass, Velocity and Center of Gravity of {\it{``I''}}, \\
+    ~~~~~~$I_I , {{\bf{\varOmega _{I}}}} = $Inertial Tensor(MoI), Angular Velocity of {\it{``I''}} \\
+    ~~~~~~$m_k , {\it{{\bf{v_k}}}}, \bf{r_k} =$ Mass, Velocity and Position of $k^{th}$ particle\\
+ \end{frame}
 
- \begin{frame} %slide 14
+  \begin{frame} % slide 13
+  \frametitle{Validation of RigidBodyCollision model}
+  	\begin{itemize}
+  	 \item Test Cases
+  	  \begin{itemize}
+ 	   \item Zhang et.al\footnotemark ~ performed experimental studies to validate a coupled Finite Volume Particle (FVP) DEM to simulate interactions between fluids and solid bodies \footnotetext{ Zhang et.al, Simulation of solid-fluid mixture flow using moving particle methods, J. Comput.Phys. 228 (2009) 25522565, http://dx.doi.org/10.1016/j.jcp.2008.12.005}
+ 	   \begin{figure}
+ 	   \centering{}
+ 	   \caption{Experimental Setup}
+ 	   \end{figure}
+ 	   \item Tank Dimensions: l = h = 26cm , w = 10cm
+ 	   \item Cylinder Properties: l = 9.9cm ,d = 1cm, $\rho =2.7 \times 10^{3} \frac{kg}{m^3} $
+      \end{itemize}
+    \end{itemize}
+    
+  \end{frame}
+  
+ \begin{frame} % slide 14
+  \frametitle{Validation of RigidBodyCollision model} 
+  	\begin{itemize}
+  	 \item Expected Profiles
+  	  \begin{figure}
+ 	   \centering{}
+ 	   \caption{Evolution of the system at various times (6 Cylinder stack)}
+ 	   \end{figure}
+ 	  \begin{figure}
+ 	   \centering{}
+ 	   \caption{6 Cylinder Center of Mass}
+ 	  \end{figure}
+    \end{itemize}
+  \end{frame}
+ 
+ \begin{frame} % slide 15
+  \frametitle{Validation of RigidBodyCollision model} % slide 15
+  	\begin{itemize}
+  	 \item Diving-in example: Simple Pendulum \pause
+  	 \item Case Setup
+  	 	\begin{itemize}
+  	 	 \item Setup is done in pure Python, using Numpy, and PySPH libraries 
+  	 	 \item Particles are created using the ``collapsing\_cylinder\_2d.py'' program
+  	 	 \item Simulation is run using the ``rigid.py'' program
+  	 	\end{itemize}\pause
+  	 \item Current Model results (Best outcomes)
+  	 \begin{itemize}
+  	  \item 
+  	 \end{itemize} \pause
+  	 \item Conclusion: The current PoC model is not physically consistent
+    \end{itemize}
+ \end{frame}
+  
+ \begin{frame} % slide 16
+  \frametitle{Making RogidBodyCollision model Physically Consistent}
+  \begin{itemize}
+   \item Current Model implements a simple Linear Spring and Dashpot Collision Model \pause
+   \item Canelas,et.al.\footnotemark  implemented a Modified, Non-Linear Hertzian model in their recently published work (Feb 2016)
+   \only<2->{\footnotetext{R.B.Canelas, et.al., SPH-DCDEM model for Arbitrary geometries in free surface solid-fluid flows, Computer Physics Communications (2016), http://dx.doi.org/10.1016/j.cpc.2016.01.006}}
+  \end{itemize}
+ \end{frame}
+ 
+ \begin{frame} %slide 17
+  \frametitle{PoA for Remaining Semester}
+  \begin{itemize}
+   \item Implement the Non-Linear Hertzian model in pySPH
+   \item Validate the Model \pause
+   \item Perform Validation Study for the Solid-Fluid Coupled Model \pause
+   \item Perform Validation Study for the Solid-Fluid Coupled Model with Fluid equations  solved with the IISPH formulation
+  \end{itemize}
+ \end{frame}
+
+ \begin{frame} %slide 18
   \frametitle{Thank you!}
 
   \begin{center}
