@@ -219,38 +219,40 @@
   \begin{frame} % slide 13
   \frametitle{Validation of RigidBodyCollision model}
   	\begin{itemize}
-  	 \item Test Cases
-  	  \begin{itemize}
- 	   \item Zhang et.al\footnotemark ~ performed experimental studies to validate a coupled Finite Volume Particle (FVP) DEM to simulate interactions between fluids and solid bodies \footnotetext{ Zhang et.al, Simulation of solid-fluid mixture flow using moving particle methods, J. Comput.Phys. 228 (2009) 25522565, http://dx.doi.org/10.1016/j.jcp.2008.12.005}
+  	 \item Test Cases: Zhang et.al\footnotemark ~ performed experimental studies to validate a coupled Finite Volume Particle (FVP) DEM to simulate interactions between fluids and solid bodies \footnotetext{ Zhang et.al, Simulation of solid-fluid mixture flow using moving particle methods, J. Comput.Phys. 228 (2009) 25522565, http://dx.doi.org/10.1016/j.jcp.2008.12.005}
  	   \begin{figure}
- 	   \centering{}
+ 	   \centering{\includegraphics[scale=0.18]{exp_setup.png}} 
  	   \caption{Experimental Setup}
  	   \end{figure}
  	   \item Tank Dimensions: l = h = 26cm , w = 10cm
  	   \item Cylinder Properties: l = 9.9cm ,d = 1cm, $\rho =2.7 \times 10^{3} \frac{kg}{m^3} $
-      \end{itemize}
     \end{itemize}
     
   \end{frame}
   
  \begin{frame} % slide 14
-  \frametitle{Validation of RigidBodyCollision model} 
-  	\begin{itemize}
-  	 \item Expected Profiles
+  \frametitle{Validation of RigidBodyCollision model: Expected Profiles} 
   	  \begin{figure}
- 	   \centering{}
+ 	   \centering{\includegraphics[scale=0.3]{6_cyl_1.png}}
  	   \caption{Evolution of the system at various times (6 Cylinder stack)}
  	   \end{figure}
- 	  \begin{figure}
- 	   \centering{}
- 	   \caption{6 Cylinder Center of Mass}
- 	  \end{figure}
-    \end{itemize}
   \end{frame}
  
+  
  \begin{frame} % slide 15
-  \frametitle{Validation of RigidBodyCollision model} % slide 15
+  \frametitle{Validation of RigidBodyCollision model: Expected Profiles} 
+  	  \begin{figure}
+ 	   \begin{tabular}{cc}
+ 	   \includegraphics[scale=0.3]{XexpDataR.png} &\includegraphics[scale=0.3]{YexpDataR.png}
+ 	   \end{tabular}
+ 	   \caption{6 Cylinder System Center of Mass}
+ 	   \end{figure}
+  \end{frame} 
+ 
+ \begin{frame} % slide 16
+  \frametitle{Validation of RigidBodyCollision model}
   	\begin{itemize}
+  	 \item Tweaking Standard Examples \pause
   	 \item Diving-in example: Simple Pendulum \pause
   	 \item Case Setup
   	 	\begin{itemize}
@@ -258,15 +260,15 @@
   	 	 \item Particles are created using the ``collapsing\_cylinder\_2d.py'' program
   	 	 \item Simulation is run using the ``rigid.py'' program
   	 	\end{itemize}\pause
-  	 \item Current Model results (Best outcomes)
+  	 \item Current Model results (Best outcome)
   	 \begin{itemize}
-  	  \item 
+  	  \item k$=$8, d$=$2.5, $\eta=$0.01, $k_{t}$=0.1
   	 \end{itemize} \pause
   	 \item Conclusion: The current PoC model is not physically consistent
     \end{itemize}
  \end{frame}
   
- \begin{frame} % slide 16
+ \begin{frame} % slide 17
   \frametitle{Making RogidBodyCollision model Physically Consistent}
   \begin{itemize}
    \item Current Model implements a simple Linear Spring and Dashpot Collision Model \pause
@@ -275,7 +277,7 @@
   \end{itemize}
  \end{frame}
  
- \begin{frame} %slide 17
+ \begin{frame} %slide 18
   \frametitle{PoA for Remaining Semester}
   \begin{itemize}
    \item Implement the Non-Linear Hertzian model in pySPH
@@ -285,7 +287,7 @@
   \end{itemize}
  \end{frame}
 
- \begin{frame} %slide 18
+ \begin{frame} %slide 19
   \frametitle{Thank you!}
 
   \begin{center}
