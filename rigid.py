@@ -11,7 +11,7 @@ from pysph.solver.solver import Solver
 from collapsing_cylinders_2d import CollapsingCylinderGeometry
 
 class CollapsingCylinders(Application):
-    def initialize(self,layers = 1):
+    def initialize(self,layers = 6):
         self.layers = layers
  
     def create_particles(self):
@@ -19,20 +19,20 @@ class CollapsingCylinders(Application):
         return geometry.create_particles()
 
     def create_solver(self):
-        kernel = CubicSpline(dim=3)
+        kernel = CubicSpline(dim=2)
         integrator = EPECIntegrator(cylinder = RK2StepRigidBody())
-        solver = Solver(kernel=kernel, dim=2, integrator=integrator, tf=10, 
-                        dt=5e-3, adaptive_timestep=False )
+        solver = Solver(kernel=kernel, dim=2, integrator=integrator, tf=0.52, 
+                        dt=1e-3, adaptive_timestep=False )
         solver.set_print_freq(10)
         return solver
 
     def create_equations(self):
         equations = [ 
             Group(equations=[
-                       BodyForce(dest='cylinder', sources=None, gy=-9.81e-2),
+                       BodyForce(dest='cylinder', sources=None, gy=-981),
               RigidBodyCollision(dest='cylinder', 
                                  sources=['cylinder', 'container'], 
-                                 k=1.25, d=1, eta=0.15, kt=0.1)]),
+                                 k=1e-2, d=2, eta=0.1, kt=0.1)]),
             Group(equations=[RigidBodyMoments(dest='cylinder',sources=None)]),
             Group(equations=[RigidBodyMotion(dest='cylinder',sources=None)]),]
         return equations

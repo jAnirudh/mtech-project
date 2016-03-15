@@ -1,13 +1,12 @@
 import numpy
-
-from pysph.base.utils import get_particle_array_rigid_body
 from display_particles import plot_particles
+from pysph.base.utils import get_particle_array_rigid_body
 
-def make_sphere_2d(dx):
+def make_sphere(dx):
     '''
-    Make a unit sphere Centered about the origin. 
     '''
     x,y,z = numpy.mgrid[-0.5:0.5+dx:dx, -0.5:0.5+dx:dx, 0:1:1j]
+
     x = x.ravel()
     y = y.ravel()
     z = z.ravel()
@@ -21,12 +20,11 @@ def make_sphere_2d(dx):
     x = numpy.delete(x, indices)
     y = numpy.delete(y, indices)
     z = numpy.delete(z, indices)
-   
+
     return x,y,z
 
-
 class CollapsingCylinderGeometry():
-    def __init__(self, nCylinder_layers = 6, hdx = 0.5):
+    def __init__(self, nCylinder_layers = 6, hdx = 1):
         self.container_rho = 15.0 # arbitrarily chosen
         self.hdx = hdx
         self.nCylinder_layers = nCylinder_layers
@@ -36,7 +34,9 @@ class CollapsingCylinderGeometry():
         '''
         rho = 2.7e-3 # kg/cm**3
         r = 0.5      # cm
-        return 1.0/n_particles * 4.0/3.0 * numpy.pi * r**3 * rho
+        l = 9.9
+
+        return 1.0/n_particles * numpy.pi * r**2 * rho # * l 
 
     def create_particles(self):
         # create Container
@@ -45,7 +45,7 @@ class CollapsingCylinderGeometry():
 
         x, y, z = numpy.mgrid[-1:27:nx*1j, -1:27:ny*1j, 0:1:1j]
 
-        interior = ((x > 0) & (x < 26)) & (y > 0) 
+        interior = ((x > 0) & (x < 26)) & (y > 0)# & ((z > 0) & (z < 10))
         container = numpy.logical_not(interior)
         x = x[container].flat
         y = y[container].flat
@@ -62,10 +62,10 @@ class CollapsingCylinderGeometry():
         # Create Cylinder Arrays
         
         r = 0.5
-        nx , ny = 15 , 15
+        nx , ny = 25, 25
         dx = 1.0 / (nx - 1)
 
-        _x, _y, _z = make_sphere_2d(dx)
+        _x, _y, _z = make_sphere(dx)
         _id = numpy.ones_like(_x,dtype=int)
         n_sphere_particles = len(_x)
         
@@ -73,7 +73,7 @@ class CollapsingCylinderGeometry():
         for layer in range(self.nCylinder_layers):
             yc = layer + r
             if layer % 2 == 0:
-                for i in range(1):
+                for i in range(6):
                     xc = i + r
                     disp.append((xc, yc, 0.0))
             else:
