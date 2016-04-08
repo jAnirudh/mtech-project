@@ -21,16 +21,16 @@ hdx = 1.
 
 class SimplePendulum(Application):
     def create_particles(self):
-        nx, ny = 7,6
+        nx, ny = 100,100
         dx = 1.0 / (nx-1)
         x_bob,y_bob,z_bob= numpy.mgrid[-r:r:nx*1j,-(l-r):-(l+r):ny*1j,0:1:1j]
-#        x_string,y_string,z_string= numpy.mgrid[0:0:1j*nx,r-l:0:1j*ny,0:1:1j]
-#        x = numpy.concatenate((x_bob,x_string),axis=0)
-#        y = numpy.concatenate((y_bob,y_string),axis=0)
-#        z = numpy.concatenate((z_bob,z_string),axis=0)
-        x = x_bob.flat
-        y = y_bob.flat
-        z = z_bob.flat
+        x_string,y_string,z_string= numpy.mgrid[0:0:1j*nx,r-l:0:1j*ny,0:1:1j]
+        x = numpy.concatenate((x_bob,x_string),axis=0)
+        y = numpy.concatenate((y_bob,y_string),axis=0)
+        z = numpy.concatenate((z_bob,z_string),axis=0)
+        x = x.flat
+        y = y.flat
+        z = z.flat
         m = numpy.ones_like(x) * dx * dx * rho0
         h = numpy.ones_like(x) * dx *hdx
 
@@ -64,5 +64,5 @@ class SimplePendulum(Application):
 
 if __name__=='__main__':
     app = SimplePendulum()
-    bob = app.create_particles()
-    #app.run()
+    #bob = app.create_particles()
+    app.run()
