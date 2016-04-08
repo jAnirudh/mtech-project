@@ -12,10 +12,10 @@ from collapsing_cylinders_2d import CollapsingCylinderGeometry
 
 class CollapsingCylinders(Application):
     def initialize(self,layers = 6):
-        self.layers = layers
+        nlayers = layers
  
     def create_particles(self):
-        geometry = CollapsingCylinderGeometry(nCylinder_layers=self.layers)
+        geometry = CollapsingCylinderGeometry(nCylinder_layers=nlayers)
         return geometry.create_particles()
 
     def create_solver(self):
