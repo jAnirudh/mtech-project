@@ -50,4 +50,8 @@ class myRigidBodyCollision(Equation):
         # Calculate Tangential Stiffness and Damping Constants
         k_t_ij = 2./7. * k_n_ij
         gamma_t_ij = 2./7. * gamma_n_ij
-        
+        # Calculate Unit Vector ETIJ
+        norm_FnIJ = sqrt(FnIJ[0]**2+FnIJ[1]**2+FnIJ[2]**2)
+        VIJDOTFnIJ = VIJ[0]*FnIJ[0]+VI1[0]*FnIJ[1]+VIJ[2]*FnIJ[2]
+        ETIJ = VIJ - VIJDOTFnIJ / (norm_FnIJ)**2 * FnIJ
+                  
