@@ -47,5 +47,7 @@ class myRigidBodyCollision(Equation):
         
         ### Calculate Contact Forces using the Modified Coulomb's Law ###
         
-        # calculate unit vector EIJT
+        # Calculate Tangential Stiffness and Damping Constants
+        k_t_ij = 2./7. * k_n_ij
+        gamma_t_ij = 2./7. * gamma_n_ij
         
