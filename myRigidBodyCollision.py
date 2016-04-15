@@ -10,9 +10,9 @@ class myRigidBodyCollision(Equation):
         r_s = sqrt(s_x[s_idx]**2 + s_y[s_idx]**2 + s_z[s_idx]**2)
         return (r_s*r_d / r_s+r_d)
      
-    def loop(self,d_idx,s_idx,d_E,s_E,d_nu,s_nu,s_mu,d_cm,s_cm,HIJ,RIJ,VIJ,
-             d_x,d_y,d_z,s_x,s_y,s_z,d_fx,d_fy,d_fz,d_total_mass,s_total_mass,
-             d_body_id, s_body_id):
+    def loop(self,d_idx,s_idx,d_E,s_E,d_nu,s_nu,d_mu,s_mu,d_cm,s_cm,HIJ,RIJ,
+             VIJ,d_x,d_y,d_z,s_x,s_y,s_z,d_fx,d_fy,d_fz,d_body_id,s_body_id,
+             d_total_mass,s_total_mass):
         '''
         '''
         # Figure out which among the (possibly) many bodies we are dealing with
@@ -50,8 +50,9 @@ class myRigidBodyCollision(Equation):
         # Calculate Tangential Stiffness and Damping Constants
         k_t_ij = 2./7. * k_n_ij
         gamma_t_ij = 2./7. * gamma_n_ij
+        # Calculate Coefficient of friction, mu_ij
+        mu_ij = 0.5*(d_mu+s_mu)
         # Calculate Unit Vector ETIJ
         norm_FnIJ = sqrt(FnIJ[0]**2+FnIJ[1]**2+FnIJ[2]**2)
         VIJDOTFnIJ = VIJ[0]*FnIJ[0]+VI1[0]*FnIJ[1]+VIJ[2]*FnIJ[2]
         ETIJ = VIJ - VIJDOTFnIJ / (norm_FnIJ)**2 * FnIJ
-                  
