@@ -34,8 +34,10 @@ class myRigidBodyCollision(Equation):
         DELTAIJ = DELTATIJ = max(0.0,HIJ - RIJ)
         # Calculate the Unit Vector between the two Center of Masses
         EIJ = zeros(3)
-        for component in range(3):
-            EIJ[component] = d_cm[component] - s_cm[component]
+        s_cm_index = 3*s_body
+        s_cm_index = 3*d_body
+        for i in range(3):
+            EIJ[i] = d_cm[d_cm_index+i] - s_cm[s_cm_index+i]
         # Normalize to obtain unit vector
         EIJ =  EIJ / sqrt(EIJ[0]**2+EIJ[1]**2+EIJ[2]**2)
         # Calculate Rate of Normal Deformation, DELTADOTIJ
