@@ -1,32 +1,35 @@
 from numpy import sqrt, reciprocal, zeros, tanh
+from pysph.sph.equation import Equation
 
 class myRigidBodyCollision(Equation):
     def __init__(self,dest,sources,Cn=1e-5):
         super(myRigidBodyCollision,self).__init__(dest,sources)
         self.Cn = Cn
         
-    def _get_Rstar(self, d_idx, s_idx, d_x, d_y, d_z, s_x, s_y, s_z):
-        '''
-        '''
-        r_d = sqrt(d_x[d_idx]**2 + d_y[d_idx]**2 + d_z[d_idx]**2)
-        r_s = sqrt(s_x[s_idx]**2 + s_y[s_idx]**2 + s_z[s_idx]**2)
-        return (r_s*r_d / r_s+r_d)
-     
     def loop(self,d_idx,s_idx,d_E,s_E,d_nu,s_nu,d_mu,s_mu,d_cm,s_cm,HIJ,RIJ,
              VIJ,d_x,d_y,d_z,s_x,s_y,s_z,d_fx,d_fy,d_fz,d_body_id,s_body_id,
              d_total_mass,s_total_mass):
         '''
         '''
+        d_body = declare('int')
+        s_body = declare('int')
         # Figure out which among the (possibly) many bodies we are dealing with
         d_body , s_body = d_body_id[d_idx], s_body_id[s_idx]
-        
+        # Calculate Material Constants
+        EI, EJ = d_E[d_idx], s_E[s_idx]
+        nuI, nuJ = d_nu[d_idx], s_nu[s_idx]
+        muI, muJ = d_mu[d_idx], s_mu[s_idx]
+        MI, MJ = d_total_mass[d_idx], s_total_mass[s_idx]
+        Ri = (d_x[d_idx]**2 + d_y[d_idx]**2 + d_z[d_idx]**2)**0.5
+        Rj = (s_x[s_idx]**2 + s_y[s_idx]**2 + s_z[s_idx]**2)**0.5
+
         ##### Calculate Normal Forces using the Modified, Non-Linear, #####
         #####                    Hertzian Model                       #####
         
         # Calculate Parameters
-        M_star = reciprocal( 1.0/d_total_mass[d_body] + 1.0/s_total_mass[s_body])
-        E_star = reciprocal( (1.0-d_nu**2)/d_E + (1.0-s_nu**2)/s_E )
-        R_star = self._get_Rstar(d_idx, s_idx, d_x, d_y, d_z, s_x, s_y, s_z)
+        M_star = (1.0/MI + 1.0/MJ)**(-1)
+        E_star = ( (1.0-nuI**2)/EI + (1.0-nuJ**2)/EJ )**(-1)
+        R_star = (Ri*Rj) / (Ri+Rj)
         # Calculate Normal Stiffness and Damping Constants
         k_n_ij = 4.0/3.0 * E_star * sqrt(R_star)
         gamma_n_ij = self.Cn*sqrt(M_star * E_star * sqrt(R_star))    
@@ -35,7 +38,7 @@ class myRigidBodyCollision(Equation):
         # Calculate the Unit Vector between the two Center of Masses
         EIJ = zeros(3)
         s_cm_index = 3*s_body
-        s_cm_index = 3*d_body
+        d_cm_index = 3*d_body
         for i in range(3):
             EIJ[i] = d_cm[d_cm_index+i] - s_cm[s_cm_index+i]
         # Normalize to obtain unit vector
