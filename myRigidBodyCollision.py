@@ -19,7 +19,7 @@ class myRigidBodyCollision(Equation):
         EI, EJ = d_E[d_idx], s_E[s_idx]
         nuI, nuJ = d_nu[d_idx], s_nu[s_idx]
         muI, muJ = d_mu[d_idx], s_mu[s_idx]
-        MI, MJ = d_total_mass[d_idx], s_total_mass[s_idx]
+        MI, MJ = d_total_mass[d_body], s_total_mass[s_body]
         Ri = (d_x[d_idx]**2 + d_y[d_idx]**2 + d_z[d_idx]**2)**0.5
         Rj = (s_x[s_idx]**2 + s_y[s_idx]**2 + s_z[s_idx]**2)**0.5
 
