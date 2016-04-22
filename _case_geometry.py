@@ -58,14 +58,14 @@ Parameters
         self.hdx = hdx
         self.nCylinder_layers = nCylinder_layers
 
-    def _cylinder_mass(self,n_particles):
-        '''Mass of Each Particle constituting the cylinder
+    def _cylinder_mass(self):
+        '''Mass of the cylinder
         '''
         rho = 2.7e-3 # kg/cm**3
         r = 0.5      # cm
         l = 9.9
 
-        return 1.0/n_particles * numpy.pi * r**2 * rho # * l 
+        return numpy.pi * r**2 * rho # * l 
 
     def create_particles(self):
         '''Creates the Container and the Cylinder stack particle arrays.
@@ -86,12 +86,16 @@ Parameters
         
         container_m = numpy.ones_like(x) * self.container_rho * dx * dx 
         container_h = numpy.ones_like(x) * self.hdx * dx
-        constants = {'E':30e4,'nu':0.3,'mu':0.45,'cm':[13.0,26.0/3.0,0.0]}
+        E = numpy.ones_like(x)*30e4
+        nu = numpy.ones_like(x)*0.3
+        mu = numpy.ones_like(x)*0.45
+        cm = numpy.asarray([13.0,26.0/3.0,0.0]*len(x))
+        constants = {'E':E,'nu':nu,'mu':mu,'cm':cm}
 
         container = get_particle_array_rigid_body(name='container',x=x,y=y,z=z,
                       m=container_m,h=container_h,constants=constants)
 
-        container.total_mass[0] = numpy.sum(container_m)
+        container.total_mass[0] = 10 #numpy.sum(container_m)
         
         # Create Cylinder Arrays
         
@@ -115,28 +119,32 @@ Parameters
                     xc = i + 2*r
                     disp.append((xc, yc, 0.0))
         self.disp = disp
-        x, y, z, body_id = [], [], [], []
+        x, y, z, body_id, cm = [], [], [], [], []
 
         for i, d in enumerate(disp):
             x.append(_x + d[0])
             y.append(_y + d[1])
             z.append(_z + d[2])
-            body_id.append(_id * i )
+            body_id.append(_id * (i+1) )
+            cm += list(len(_x)*d)
 
         x = numpy.concatenate(x)
         y = numpy.concatenate(y)
         z = numpy.concatenate(z)
         body_id = numpy.concatenate(body_id)
-        m = numpy.ones_like(x) * self._cylinder_mass(n_sphere_particles)
+        m = numpy.ones_like(x) * self._cylinder_mass()/n_sphere_particles
         h = numpy.ones_like(x) * self.hdx * 1.0 / (n_sphere_particles - 1)
-        cm = [component for coord in disp for component in coord]
-        constants = {'E':69e5, 'nu':0.3, 'mu':0.45,'cm':cm }
+        E = numpy.ones_like(x) * 69e5
+        nu = numpy.ones_like(x) * 0.3
+        mu = numpy.ones_like(x) * 0.45
+        constants = {'E':E, 'nu':nu, 'mu':mu,'cm':cm }
         cylinder = get_particle_array_rigid_body(name='cylinder',x=x,y=y,z=z,
                         m=m,h=h,body_id=body_id,constants=constants )
-
+        cylinder.total_mass = numpy.asarray(len(disp)*[self._cylinder_mass()])
         return [cylinder, container]
 
 if __name__== '__main__':
-#    app = CollapsingCylinderGeometry()
-    app = CollapsingCylinderGeometry(nCylinder_layers = 8)
-    plot_particles(app.create_particles())
+    app = CollapsingCylinderGeometry()
+#    app = CollapsingCylinderGeometry(nCylinder_layers = 8)
+    cyl,box = app.create_particles()
+#    plot_particles(app.create_particles())
