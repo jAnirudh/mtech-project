@@ -1,4 +1,3 @@
-from numpy import sqrt, reciprocal, zeros, tanh
 from pysph.sph.equation import Equation
 
 class myRigidBodyCollision(Equation):
@@ -7,15 +6,19 @@ class myRigidBodyCollision(Equation):
         self.Cn = Cn
 
     def loop(self,d_idx,s_idx,d_E,s_E,d_nu,s_nu,d_mu,s_mu,d_cm,s_cm,HIJ,RIJ,
-             VIJ,d_x,d_y,d_z,s_x,s_y,s_z,d_Fx,d_Fy,d_Fz,d_body_id,s_body_id
+             VIJ,d_x,d_y,d_z,s_x,s_y,s_z,d_Fx,d_Fy,d_Fz,d_body_id,s_body_id,
              d_total_mass,s_total_mass):
         '''
         '''
-
+        #print '\n\nin mRBCol\n\n'
         FnIJ = declare('matrix((3,))')
         FtIJ = declare('matrix((3,))')
         EIJ = declare('matrix((3,))')
         ETIJ = declare('matrix((3,))')
+
+        #print '==============================================================='
+        #print 'id=%s Fx=%s Fy=%s Fz=%s' %(d_idx,d_Fx[d_idx],d_Fy[d_idx],d_Fz[d_idx])
+        #print '==============================================================='
 
         if d_body_id[d_idx] != s_body_id[s_idx]:
             # Calculate Material Constants
@@ -76,7 +79,11 @@ class myRigidBodyCollision(Equation):
                 FtIJ[i] = min(Fc,(FtrIJ-FtdIJ)) * ETIJ[i]
 
             ####               Total Contact Forces                       ####
+            d_Fx[d_body_id[d_idx]] += FnIJ[0] + FtIJ[0]
+            d_Fy[d_body_id[d_idx]] += FnIJ[1] + FtIJ[1]
+            d_Fz[d_body_id[d_idx]] += FnIJ[2] + FtIJ[2]
 
-    def post_loop(self,d_body_id,d_idx):
-        pass
-
+    def post_loop(self,d_idx,d_body_id,d_Fx,d_Fy,d_Fz,d_fx,d_fy,d_fz):
+       d_fx[d_idx] += d_Fx[d_body_id[d_idx]] 
+       d_fy[d_idx] += d_Fy[d_body_id[d_idx]]
+       d_fz[d_idx] += d_Fz[d_body_id[d_idx]] 
