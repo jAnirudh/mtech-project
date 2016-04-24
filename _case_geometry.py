@@ -85,15 +85,16 @@ Parameters
         z = z[container].flat
         
         container_m = numpy.ones_like(x) * self.container_rho * dx * dx 
-        container_h = numpy.ones_like(x) * self.hdx * dx
+        container_h = numpy.ones_like(x) * self.hdx * 5 * dx
         E = numpy.ones_like(x)*30e4
         nu = numpy.ones_like(x)*0.3
         mu = numpy.ones_like(x)*0.45
         cm = numpy.asarray([13.0,26.0/3.0,0.0]*len(x))
+        body_id = numpy.ones_like(x,dtype='int32')*33
         constants = {'E':E,'nu':nu,'mu':mu,'cm':cm}
 
         container = get_particle_array_rigid_body(name='container',x=x,y=y,z=z,
-                      m=container_m,h=container_h,constants=constants)
+             m=container_m,h=container_h,constants=constants,body_id=body_id)
 
         container.total_mass[0] = 10 #numpy.sum(container_m)
         
@@ -125,7 +126,7 @@ Parameters
             x.append(_x + d[0])
             y.append(_y + d[1])
             z.append(_z + d[2])
-            body_id.append(_id * (i+1) )
+            body_id.append(_id * i )
             cm += list(len(_x)*d)
 
         x = numpy.concatenate(x)
@@ -137,9 +138,12 @@ Parameters
         E = numpy.ones_like(x) * 69e5
         nu = numpy.ones_like(x) * 0.3
         mu = numpy.ones_like(x) * 0.45
-        constants = {'E':E, 'nu':nu, 'mu':mu,'cm':cm }
+        Fx = numpy.zeros(33)
+        Fy = numpy.zeros(33)
+        Fz = numpy.zeros(33)
+        constants = {'E':E, 'nu':nu, 'mu':mu,'cm':cm,'Fx':Fx,'Fy':Fy,'Fz':Fz}
         cylinder = get_particle_array_rigid_body(name='cylinder',x=x,y=y,z=z,
-                        m=m,h=h,body_id=body_id,constants=constants )
+                        m=m,h=h,body_id=body_id,constants=constants)
         cylinder.total_mass = numpy.asarray(len(disp)*[self._cylinder_mass()])
         return [cylinder, container]
 
