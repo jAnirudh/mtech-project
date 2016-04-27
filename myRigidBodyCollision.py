@@ -10,22 +10,18 @@ class myRigidBodyCollision(Equation):
              d_total_mass,s_total_mass):
         '''
         '''
-        #print '\n\nin mRBCol\n\n'
         FnIJ = declare('matrix((3,))')
         FtIJ = declare('matrix((3,))')
         EIJ = declare('matrix((3,))')
         ETIJ = declare('matrix((3,))')
-
-        #print '==============================================================='
-        #print 'id=%s Fx=%s Fy=%s Fz=%s' %(d_idx,d_Fx[d_idx],d_Fy[d_idx],d_Fz[d_idx])
-        #print '==============================================================='
-
-        if d_body_id[d_idx] != s_body_id[s_idx]:
+        
+        if d_body_id[d_idx] != s_body_id[s_idx] :
             # Calculate Material Constants
             EI, EJ = d_E[d_idx], s_E[s_idx]
             nuI, nuJ = d_nu[d_idx], s_nu[s_idx]
             muI, muJ = d_mu[d_idx], s_mu[s_idx]
-            MI, MJ = d_total_mass[d_idx], s_total_mass[s_idx]
+            MI = d_total_mass[d_body_id[d_idx]]
+            MJ = s_total_mass[d_body_id[s_idx]]
             Ri = sqrt(d_x[d_idx]**2 + d_y[d_idx]**2 + d_z[d_idx]**2)
             Rj = sqrt(s_x[s_idx]**2 + s_y[s_idx]**2 + s_z[s_idx]**2)
 
@@ -33,9 +29,9 @@ class myRigidBodyCollision(Equation):
             #####                    Hertzian Model                       #####
 
             # Calculate Parameters
-            M_star = (1.0/MI + 1.0/MJ)**(-1)
-            E_star = ( (1.0-nuI**2)/EI + (1.0-nuJ**2)/EJ )**(-1)
-            R_star = (Ri*Rj) / (Ri+Rj)
+            M_star = (MI*MJ)/(MI+MJ)
+            E_star = (EI*EJ)/(EJ*(1.0-nuI**2) + EI*(1.0-nuJ**2))
+            R_star = (Ri*Rj)/(Ri+Rj)
             # Calculate Normal Stiffness and Damping Constants
             k_n_ij = 4.0/3.0 * E_star * sqrt(R_star)
             gamma_n_ij = self.Cn*sqrt(M_star * E_star * sqrt(R_star))
