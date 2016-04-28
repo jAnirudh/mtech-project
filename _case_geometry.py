@@ -76,14 +76,21 @@ Parameters
         nx, ny = 500, 500
         dx = 1.0 / (nx -1)
 
-        x, y, z = numpy.mgrid[-1:27:nx*1j, -1:27:ny*1j, 0:1:1j]
+        #x, y, z = numpy.mgrid[-1:27:nx*1j, -1:27:ny*1j, 0:1:1j]
 
-        interior = ((x > 0) & (x < 26)) & (y > 0)
-        container = numpy.logical_not(interior)
-        x = x[container].flat
-        y = y[container].flat
-        z = z[container].flat
-        
+        #interior = ((x > 0) & (x < 26)) & (y > 0)
+        #container = numpy.logical_not(interior)
+        #x = x[container].flat
+        #y = y[container].flat
+        #z = z[container].flat
+        x1,y1,z1 = numpy.mgrid[-1:0:500j,-1:26:1000j,0:1:1j]
+        x2,y2,z2 = numpy.mgrid[0:26:1000j,-1:0:500j,0:1:1j]
+        x3,y3,z3 = numpy.mgrid[26:27:500j,-1:26:1000j,0:1:1j]
+
+        x = numpy.concatenate((x1.flat,x2.flat,x3.flat),axis=0)
+        y = numpy.concatenate((y1.flat,y2.flat,y3.flat),axis=0)
+        z = numpy.concatenate((z1.flat,z2.flat,z3.flat),axis=0)
+ 
         container_m = numpy.ones_like(x) * self.container_rho * dx * dx 
         container_h = numpy.ones_like(x) * self.hdx * 5 * dx
         E = numpy.ones_like(x)*30e4
