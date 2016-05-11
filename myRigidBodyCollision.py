@@ -14,14 +14,20 @@ class myRigidBodyCollision(Equation):
         FtIJ = declare('matrix((3,))')
         EIJ = declare('matrix((3,))')
         ETIJ = declare('matrix((3,))')
-        
-        if d_body_id[d_idx] != s_body_id[s_idx] :
+
+        d_bID = declare('int')
+        s_bID = declare('int')
+
+        d_bID = d_body_id[d_idx]
+        s_bID = s_body_id[s_idx]
+   
+        if d_bID != s_bID :
             # Calculate Material Constants
             EI, EJ = d_E[d_idx], s_E[s_idx]
             nuI, nuJ = d_nu[d_idx], s_nu[s_idx]
             muI, muJ = d_mu[d_idx], s_mu[s_idx]
-            MI = d_total_mass[d_body_id[d_idx]]
-            MJ = s_total_mass[d_body_id[s_idx]]
+            MI = d_total_mass[d_bID]
+            MJ = s_total_mass[s_bID]
             Ri = sqrt(d_x[d_idx]**2 + d_y[d_idx]**2 + d_z[d_idx]**2)
             Rj = sqrt(s_x[s_idx]**2 + s_y[s_idx]**2 + s_z[s_idx]**2)
 
