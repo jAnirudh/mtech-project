@@ -38,20 +38,22 @@ class myRigidBodyCollision(Equation):
             # Calculate Particle Overlap
             DELTAIJ = DELTATIJ = max(0.0,HIJ - RIJ)
             # Calculate the Unit Vector between the two Center of Masses
-            E2IJ = 0.0
-            for i in range(3):
-                EIJ[i] = d_cm[3*d_idx + i] - s_cm[3*s_idx + i]
-                E2IJ += EIJ[i]**2
+            EIJ[0] = d_cm[3*d_idx + 0] - s_cm[3*s_idx + 0]
+            EIJ[1] = d_cm[3*d_idx + 1] - s_cm[3*s_idx + 1]
+            EIJ[2] = d_cm[3*d_idx + 2] - s_cm[3*s_idx + 2]
+            E2IJ = EIJ[0]**2 + EIJ[1]**2 + EIJ[2]**2 
             # Normalize to obtain unit vector
-            for i in range(3): 
-                EIJ[i] =  EIJ[i] / sqrt(E2IJ)
+            EIJ[0] =  EIJ[0] / sqrt(E2IJ)
+            EIJ[1] =  EIJ[1] / sqrt(E2IJ)
+            EIJ[2] =  EIJ[2] / sqrt(E2IJ)
             # Calculate Rate of Normal Deformation, DELTADOTIJ
             DELTADOTIJ = VIJ[0]*EIJ[0] + VIJ[1]*EIJ[1] + VIJ[2]*EIJ[2]
             # Calculate Normal Contact Force, FnIJ
             FnrIJ = k_n_ij*DELTAIJ**(1.5)                 # mag of Repulsive force
             FndIJ = gamma_n_ij*DELTAIJ**(0.25)*DELTADOTIJ # mag of Damping force
-            for i in range(3):
-                FnIJ[i] = EIJ[i] * (FnrIJ - FndIJ)
+            FnIJ[0] = EIJ[0] * (FnrIJ - FndIJ)
+            FnIJ[1] = EIJ[1] * (FnrIJ - FndIJ)
+            FnIJ[2] = EIJ[2] * (FnrIJ - FndIJ)
 
             ####               Calculate Tangential Forces                ####
 
@@ -61,8 +63,9 @@ class myRigidBodyCollision(Equation):
             # Calculate Coefficient of friction, mu_ij
             mu_f_ij = 0.5*(muI+muJ)
             # Calculate Unit Vector ETIJ
-            for i in range(3):
-                ETIJ[i] = VIJ[i] - (DELTADOTIJ * EIJ[i])
+            ETIJ[0] = VIJ[0] - (DELTADOTIJ * EIJ[0])
+            ETIJ[1] = VIJ[1] - (DELTADOTIJ * EIJ[1])
+            ETIJ[2] = VIJ[2] - (DELTADOTIJ * EIJ[2])
             # Calculate Rate of Tangential Deformation, DELTATDOTIJ
             DELTATDOTIJ = VIJ[0]*ETIJ[0] + VIJ[1]*ETIJ[1] + VIJ[2]*ETIJ[2]
             # Calculate Tangential Contact Force
@@ -71,8 +74,9 @@ class myRigidBodyCollision(Equation):
             # Modified Coulomb Friction Force using the Sigmoid Function, Fc
             Fc = mu_f_ij*(FnrIJ-FndIJ)*tanh(8*DELTATDOTIJ)
             # Calculate Tangential Contact Force
-            for i in range(3):
-                FtIJ[i] = min(Fc,(FtrIJ-FtdIJ)) * ETIJ[i]
+            FtIJ[0] = min(Fc,(FtrIJ-FtdIJ)) * ETIJ[0]
+            FtIJ[1] = min(Fc,(FtrIJ-FtdIJ)) * ETIJ[1]
+            FtIJ[2] = min(Fc,(FtrIJ-FtdIJ)) * ETIJ[2]
 
             ####               Total Contact Forces                       ####
             d_Fx[d_body_id[d_idx]] += FnIJ[0] + FtIJ[0]
