@@ -51,7 +51,7 @@ Parameters
             Density of the container. 
             (Value is chosen arbitrarily and may need tuning) 
     '''
-    def __init__(self,nCylinder_layers = 6,hdx = 1.0,container_rho=15.0):
+    def __init__(self,nCylinder_layers = 6,hdx =1.0,container_rho=1.0):
         msg = 'Allowed number of layers in the Cylinder stack = 6/12.\n'
         assert(nCylinder_layers in [6,12]), msg+self.__doc__
         self.container_rho = container_rho
@@ -65,7 +65,7 @@ Parameters
         r = 0.5      # cm
         l = 9.9
 
-        return numpy.pi * r**2 * rho # * l 
+        return numpy.pi * r**2 * rho  * l 
 
     def create_particles(self):
         '''Creates the Container and the Cylinder stack particle arrays.
@@ -73,26 +73,26 @@ Parameters
         The Dimensions
         '''
         # create Container
-        nx, ny = 500, 500
+        nx, ny = 700, 700
         dx = 1.0 / (nx -1)
 
-        #x, y, z = numpy.mgrid[-1:27:nx*1j, -1:27:ny*1j, 0:1:1j]
+        x, y, z = numpy.mgrid[-1:27:nx*1j, -1:27:ny*1j, 0:1:1j]
 
-        #interior = ((x > 0) & (x < 26)) & (y > 0)
-        #container = numpy.logical_not(interior)
-        #x = x[container].flat
-        #y = y[container].flat
-        #z = z[container].flat
-        x1,y1,z1 = numpy.mgrid[-1:0:500j,-1:26:1000j,0:1:1j]
-        x2,y2,z2 = numpy.mgrid[0:26:1000j,-1:0:500j,0:1:1j]
-        x3,y3,z3 = numpy.mgrid[26:27:500j,-1:26:1000j,0:1:1j]
+        interior = ((x > 0) & (x < 26)) & (y > 0)
+        container = numpy.logical_not(interior)
+        x = x[container].flat
+        y = y[container].flat
+        z = z[container].flat
+        #x1,y1,z1 = numpy.mgrid[-1:0:100j,-1:26:200j,0:1:1j]
+        #x2,y2,z2 = numpy.mgrid[0:26:200j,-1:0:100j,0:1:1j]
+        #x3,y3,z3 = numpy.mgrid[26:27:100j,-1:26:200j,0:1:1j]
 
-        x = numpy.concatenate((x1.flat,x2.flat,x3.flat),axis=0)
-        y = numpy.concatenate((y1.flat,y2.flat,y3.flat),axis=0)
-        z = numpy.concatenate((z1.flat,z2.flat,z3.flat),axis=0)
+        #x = numpy.concatenate((x1.flat,x2.flat,x3.flat),axis=0)
+        #y = numpy.concatenate((y1.flat,y2.flat,y3.flat),axis=0)
+        #z = numpy.concatenate((z1.flat,z2.flat,z3.flat),axis=0)
  
         container_m = numpy.ones_like(x) * self.container_rho * dx * dx 
-        container_h = numpy.ones_like(x) * self.hdx * 5 * dx
+        container_h = numpy.ones_like(x) * self.hdx  *5* dx
         E = numpy.ones_like(x)*30e4
         nu = numpy.ones_like(x)*0.3
         mu = numpy.ones_like(x)*0.45
@@ -103,12 +103,12 @@ Parameters
         container = get_particle_array_rigid_body(name='container',x=x,y=y,z=z,
              m=container_m,h=container_h,constants=constants,body_id=body_id)
 
-        container.total_mass[0] = 10 #numpy.sum(container_m)
+        container.total_mass[0] = numpy.sum(container_m)
         
         # Create Cylinder Arrays
         
         r = 0.5
-        nx , ny = 25, 25
+        nx , ny = 20, 20
         dx = 1.0 / (nx - 1)
 
         _x, _y, _z = make_2dCyl(dx)
@@ -148,14 +148,18 @@ Parameters
         Fx = numpy.zeros(33)
         Fy = numpy.zeros(33)
         Fz = numpy.zeros(33)
-        constants = {'E':E, 'nu':nu, 'mu':mu,'cm':cm,'Fx':Fx,'Fy':Fy,'Fz':Fz}
+        checkBit = numpy.zeros(33,dtype="int32")
+        Fmag = numpy.zeros(33)
+        constants = {'E':E, 'nu':nu, 'mu':mu,'cm':cm,'Fx':Fx,'Fy':Fy,'Fz':Fz,
+                      'check_bit':checkBit,'Fmag':Fmag}
         cylinder = get_particle_array_rigid_body(name='cylinder',x=x,y=y,z=z,
                         m=m,h=h,body_id=body_id,constants=constants)
         cylinder.total_mass = numpy.asarray(len(disp)*[self._cylinder_mass()])
+        #cylinder.vc[1::3]=-100.0
         return [cylinder, container]
 
 if __name__== '__main__':
     app = CollapsingCylinderGeometry()
 #    app = CollapsingCylinderGeometry(nCylinder_layers = 8)
     cyl,box = app.create_particles()
-#    plot_particles(app.create_particles())
+    plot_particles(app.create_particles())

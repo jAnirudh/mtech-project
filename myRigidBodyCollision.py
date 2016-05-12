@@ -7,7 +7,7 @@ class myRigidBodyCollision(Equation):
 
     def loop(self,d_idx,s_idx,d_E,s_E,d_nu,s_nu,d_mu,s_mu,d_cm,s_cm,HIJ,RIJ,
              VIJ,d_x,d_y,d_z,s_x,s_y,s_z,d_Fx,d_Fy,d_Fz,d_body_id,s_body_id,
-             d_total_mass,s_total_mass):
+             d_total_mass,s_total_mass,d_check_bit,d_Fmag):
         '''
         '''
         FnIJ = declare('matrix((3,))')
@@ -60,6 +60,7 @@ class myRigidBodyCollision(Equation):
             FnIJ[0] = EIJ[0] * (FnrIJ - FndIJ)
             FnIJ[1] = EIJ[1] * (FnrIJ - FndIJ)
             FnIJ[2] = EIJ[2] * (FnrIJ - FndIJ)
+            #print "%s %s" %(HIJ,RIJ)#DELTAIJ#k_n_ij#FnrIJ# - FndIJ
 
             ####               Calculate Tangential Forces                ####
 
@@ -85,11 +86,42 @@ class myRigidBodyCollision(Equation):
             FtIJ[2] = min(Fc,(FtrIJ-FtdIJ)) * ETIJ[2]
 
             ####               Total Contact Forces                       ####
-            d_Fx[d_body_id[d_idx]] += FnIJ[0] + FtIJ[0]
-            d_Fy[d_body_id[d_idx]] += FnIJ[1] + FtIJ[1]
-            d_Fz[d_body_id[d_idx]] += FnIJ[2] + FtIJ[2]
+            Fmag=sqrt((FnIJ[0]+FtIJ[0])**2+(FnIJ[1]+FtIJ[1])**2+\
+                      (FnIJ[2]+FtIJ[2])**2)
 
-    def post_loop(self,d_idx,d_body_id,d_Fx,d_Fy,d_Fz,d_fx,d_fy,d_fz):
-       d_fx[d_idx] += d_Fx[d_body_id[d_idx]] 
-       d_fy[d_idx] += d_Fy[d_body_id[d_idx]]
-       d_fz[d_idx] += d_Fz[d_body_id[d_idx]] 
+            #print "======================================================"
+            #print "Before checkbit"
+            #print d_check_bit[d_bID]
+            #print "Fmag = %s" %Fmag
+            #print "======================================================"
+            if d_check_bit[d_bID] ==  0 :
+                #print "Checkbit!"
+                #print Fmag
+                d_Fmag[d_bID] = Fmag
+                d_Fx[d_bID] = FnIJ[0] + FtIJ[0]
+                d_Fy[d_bID] = FnIJ[1] + FtIJ[1]
+                d_Fz[d_bID] = FnIJ[2] + FtIJ[2]
+                d_check_bit[d_bID] = 1
+            elif Fmag - d_Fmag[d_bID] > 1e-9:
+                #print "Else checkbit"
+                d_Fmag[d_bID] = Fmag
+                d_Fx[d_bID] = FnIJ[0] + FtIJ[0]
+                d_Fy[d_bID] = FnIJ[1] + FtIJ[1]
+                d_Fz[d_bID] = FnIJ[2] + FtIJ[2]
+
+            #print "Fmag = %s, Fmag[%s]=%s" %(Fmag,d_bID,d_Fmag[d_bID])
+            #print "d_Fx[%s]=%s d_Fy[%s]=%s d_Fz[%s]=%s" %(d_bID,d_Fx[d_bID],d_bID,d_Fy[d_bID],d_bID,d_Fz[d_bID])
+            #print "After checkbit"
+            #print d_check_bit[d_bID]
+            #print "======================================================"
+ 
+    def post_loop(self,d_idx,d_body_id,d_Fx,d_Fy,d_Fz,d_fx,d_fy,d_fz,
+                  d_Fmag,d_check_bit):
+        d_fx[d_idx] += d_Fx[d_body_id[d_idx]] 
+        d_fy[d_idx] += d_Fy[d_body_id[d_idx]]
+        d_fz[d_idx] += d_Fz[d_body_id[d_idx]]
+        # reset check_bits and force magnitude
+        d_check_bit[d_body_id[d_idx]] = 0
+        #print "======================================================"
+        #print "id=%s fx=%s fy=%s" %(d_body_id[d_idx],d_fx[d_idx],d_fy[d_idx])
+        #print "======================================================"

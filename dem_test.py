@@ -18,21 +18,21 @@ class CollapsingCylinders(Application):
         self.nlayers = layers
  
     def create_particles(self):
-        geometry = CollapsingCylinderGeometry(nCylinder_layers=self.nlayers)
+        geometry = CollapsingCylinderGeometry(nCylinder_layers=self.nlayers,hdx=12.5)
         return geometry.create_particles()
 
     def create_solver(self):
         kernel = CubicSpline(dim=2)
         integrator = EPECIntegrator(cylinder = RK2StepRigidBody())
-        solver = Solver(kernel=kernel, dim=2, integrator=integrator, tf=0.52, 
-                        dt=1e-3, adaptive_timestep=False )
-        solver.set_print_freq(10)
+        solver = Solver(kernel=kernel, dim=2, integrator=integrator, tf=0.12, 
+                        dt=1e-6, adaptive_timestep=False )
+        solver.set_print_freq(1)
         return solver
 
     def create_equations(self):
         equations = [ 
             Group(equations=[
-                       BodyForce(dest='cylinder', sources=None, gy=-981),
+                       BodyForce(dest='cylinder', sources=None, gy=-9.81),
               myRigidBodyCollision(dest='cylinder', 
                                 sources=['cylinder', 'container'],Cn=1.4e-5)]),
             Group(equations=[RigidBodyMoments(dest='cylinder',sources=None)]),
