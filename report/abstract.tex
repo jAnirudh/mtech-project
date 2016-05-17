@@ -1,0 +1,7 @@
+\chapter*{Abstract}
+
+Problems incorporating both solid-fluid and solid-solid interations are prevalent in a large number of engineering disciplines. Traditional approches using Eulerian approaches suffer on account of having to keep track of, and accurately capture the complicated solid-fluid interfaces. A fairly established numerical scheme to model solid-solid interactions is that of the Discrete Element Method (DEM). Further, recent attempts to use meshfree particle methods such as Smoothed Particle Hydrodynamics (SPH) for fluid flow problems have shown encouraging results.
+
+Both the DEM and SPH, being particle methods, seem to be good candidates for integration, whence a robust and fully Lagrangian formulation can be realised. PySPH, an open source Python based framework to perform Smoothed Particle Hydrodynamics simulations, being notoriously user and developer friendly is the mouthpiece of choice in which such an integration is attempted.
+
+The present work first elucidates the structure of the PySPH framework, describes a simple DEM based Rigid Body Collision Model, followed by its Proof of Concept implementation in PySPH . Thereafter, a numerical validation study performed to ascertain the physical consistency of the model is detailed; it is followed by the description of an optimized Collsion model based on recent research endeavours and the development of an algorithm to implement in PySPH. Finally the implementation in the PySPH framework is discussed.
