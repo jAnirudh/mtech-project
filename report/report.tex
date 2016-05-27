@@ -1,0 +1,111 @@
+\documentclass[a4paper,11pt,twoside]{cbk} %%% Do not alter this line
+ \input{cpr}                              %%% Do not alter this line
+
+ %%% <<<< mandatory information about this report ....
+ %%%
+  % report title
+  \newcommand{\Title}{Validation of Rigid Body Collision Models in the PySPH Framework}
+
+  % author
+  \newcommand{\Author}{Anirudh Jonnalagadda}
+
+  % author's ID at CMS
+  \newcommand{\AuthorID}{CMS1403}
+
+  % academic year of submission
+  \newcommand{\AY}{2015-16}
+
+  % project period
+  \newcommand{\DateFrom}{January 2016} % from
+  \newcommand{\DateTo}{June 2016}      % to
+
+  % advisor 1, name and affiliation
+  \newcommand{\AdvisorA} % set this to {} if not applicable
+   {
+    \textbf{Prabhu Ramachandran}, Professor
+
+    Department of Aerospace Engineering
+
+    IIT Bombay
+ 
+    Mumbai 400 076 India
+
+   }
+
+  % advisor 2, name and affiliation
+  \newcommand{\AdvisorB}{} % set this to {} if not applicable
+
+  % advisor from CMS
+  \newcommand{\AdvisorC}
+   {
+    \textbf{Sukratu Barve}, Assistant Professor
+
+    \cms
+
+    \uop
+
+    Pune 411007 India
+
+   }
+
+  % CMS director
+  \newcommand{\Director}
+   {
+    \textbf{Anjali Kshirsagar}, Director
+
+    \cms
+
+    \uop
+
+    Pune 411007 India
+
+   }
+ %%%
+ %%% .... mandatory information about this report >>>>
+
+ % author preferences, macros, colors, etc.
+ \usepackage{wrapfig}
+ % \hypersetup{colorlinks,citecolor=black,filecolor=black,linkcolor=black,urlcolor=black}
+ \definecolor{turquoise}{HTML}{06959b}
+ \definecolor{manpurple}{rgb}{0.419607843,0.1725490196,0.56862745098}
+ \usepackage{amsmath}
+ \usepackage{hyperref} 
+
+\begin{document}
+ %%% <<<< mandatory initial pages ....
+  \FrontPage
+  \Certificate
+  \Declaration
+ %%% .... mandatory initial pages >>>>
+
+ \input{abstract}
+ \addcontentsline{toc}{chapter}{Abstract}
+
+ \input{acknowledgements}
+ \addcontentsline{toc}{chapter}{Acknowledgments}
+
+ %\chapter*{\strut}
+ %{\large
+ % \emph{Look deep into nature, and then you will understand everything better.}
+
+ %\vspace{1em}
+ %~ \hfill \textendash Albert Einstein
+ %}
+
+ \tableofcontents
+
+ \input{chapter1} % introduction
+ \input{chapter2} % Numerical Methods
+ \input{chapter3} % PySPH
+ %\input{chapter4} % part 2 models, methods, results, discussion
+ %\input{chapter5} % conclusion and future work
+
+ \bibliographystyle{apalike} % some standard bibtex style
+ \bibliography{report}       % should be in the .bib format
+ \addcontentsline{toc}{chapter}{Bibliography}
+
+ % any additional material that belongs to appendices
+ %\appendix
+ %\input{appendix1} % molecular biology stuff
+ %\input{appendix2} % acronyms
+\end{document}
