@@ -61,7 +61,7 @@ The terms $\mathcal{D}, \mathcal{F}$ and $\mathcal{E}$ are representations of th
 \item \textbf{\textit{Miscellaneous: }}Lastly, data structures, routines and tools to construct solvers, equations, post process the results etc. are required. For post processing, the MayaVi\footnote[7]{\url{http://code.enthought.com/projects/mayavi/}} tool is utilized whereas all other requirements are addressed via routines in the source-code.
 \end{itemize} 
 
-\section{Design}
+\section{Design}\label{sec:pysph_design}
 
 Although superficially it may look like PySPH is written in Python, it is, in reality, a blend of multiple languages. Cython is used to implement the performance critical neighbour queries and pair-wise force computations by creating C/C++ extensions. Further PySPH implements Run Time Code Generation (RTCG) using Python's string processing capabilities to generate OpenCL code on the fly and dynamically compiles it using PyOpenCL\cite{PyOpenCL}. Thus any case setup using PySPH is inherently converted into C/C++ extensions using Cython which ascribes it it's computational edge. Distributed memory computations can be performed via MPI using the Python binding mpi4py \cite{mpi4py} and dynamic load balancing is achieved through the Zoltan data management library \cite{zoltan} via a custom Python wrapper. PySPH can also be seamlessly integrated to use OpenMP for speed-up on systems with multiple cores.
 

@@ -72,6 +72,26 @@
  \usepackage{hyperref} 
  \usepackage{minted}
  \usepackage{subcaption}
+ \usepackage{array}
+ \usepackage{listings}
+ 
+ \newcolumntype{L}{>{\centering\arraybackslash}m{10cm}}
+
+ \lstset
+ {
+    basicstyle=\small\ttfamily,
+    commentstyle=\color{Green},
+    keywordstyle=\color{Cerulean},
+    frame=L,
+    language=python,
+    morekeywords={True, False},
+    numbers=left,
+    numbersep=10pt,
+    numberstyle=\footnotesize\color{Gray},
+    showstringspaces=false,
+    stringstyle=\color{Mulberry},
+    tabsize=3,
+ }
 
 \begin{document}
 
@@ -92,8 +112,8 @@
  \input{chapter1} % introduction
  \input{chapter2} % Numerical Methods
  \input{chapter3} % PySPH
- \input{chapter4} % part 2 models, methods, results, discussion
- %\input{chapter5} % conclusion and future work
+ \input{chapter4} % 
+ \input{chapter5} % 
 
  \bibliographystyle{apalike} % some standard bibtex style
  \bibliography{report}       % should be in the .bib format
