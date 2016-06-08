@@ -74,7 +74,9 @@
  \usepackage{subcaption}
  \usepackage{array}
  \usepackage{listings}
- 
+ \usepackage{tikz}
+ \usetikzlibrary{shapes,arrows}
+
  \newcolumntype{L}{>{\centering\arraybackslash}m{10cm}}
 
  \lstset
@@ -114,6 +116,7 @@
  \input{chapter3} % PySPH
  \input{chapter4} % 
  \input{chapter5} % 
+ \input{chapter6} % 
 
  \bibliographystyle{apalike} % some standard bibtex style
  \bibliography{report}       % should be in the .bib format
@@ -122,4 +125,5 @@
  % any additional material that belongs to appendices
  \appendix
  \input{appendix1.tex} 
+ \input{appendix2.tex} 
 \end{document}

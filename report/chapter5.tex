@@ -1,6 +1,6 @@
 \chapter{The Distributed Contact Discrete Element Method}
 
-The Distributed Contact Discrete Element Method (DCDEM) \cite{canelas} is a variation of the Discrete Element Method wherein the \textbf{Contact Forces }$F^t_i$  acting on the $i^{th}$ particle due to collision with the $j^{th}$ particle is decomposed into \textbf{Normal and Tangential components}  $F_n$ and $F_t$ respectively. Both $F_n$ and $F_t$ are further resolved as \textbf{Repulsive and Dissipative forces},  $F^r$ and $F^d$, coming into existence due to the deformation of the material and the dissipation of energy during the deformation respectively. The DEM mechanisms in two interacting particles is as shown in Figure \ref{fig:dem_mechanism}.
+The Distributed Contact Discrete Element Method (DCDEM) \cite{canelas} is a variation of the Discrete Element Method wherein the \textbf{Contact Forces }$F^T_i$  acting on the $i^{th}$ particle due to collision with the $j^{th}$ particle is decomposed into \textbf{Normal} and \textbf{Tangential components}, $F_n$ and $F_t$, respectively. Both $F_n$ and $F_t$ are further resolved as \textbf{Repulsive} and \textbf{Dissipative} forces, $F^r$ and $F^d$, coming into existence due to the deformation of the material and the dissipation of energy during the deformation respectively. The DEM mechanisms in two interacting particles is as shown in Figure \ref{fig:dem_mechanism}.
 
 \begin{figure}[htb!]
  \begin{subfigure}{.5\textwidth}
@@ -41,7 +41,7 @@ $\frac{1}{E^*} = \frac{1-\nu_I^2}{E_I}+\frac{1-\nu_I^2}{E_I}$ \hspace{0.375cm} ;
 with $C_n$ of the order of $10^{-5}$\\
 
 
-The Tangential Contact Forces are given by Linear Hertzian model bounded by a modified Coulomb Friction Law; the Coulomb Friction Law is modified by means of a sigmoidal function to account for the discontinuity coming into existence when the tangential velocity of the interacting bodies is zero\cite{vetsch}. The model is given as:
+The Tangential Contact Forces are given by a Linear Hertzian model bounded by a modified Coulomb Friction Law; the Coulomb Friction Law is modified by means of a sigmoidal function to account for the discontinuity coming into existence when the tangential velocity of the interacting bodies is zero \cite{vetsch}. The model is given as:
 
 \begin{eqnarray}
  {\bf{F}}_{t,ij} = min(\mu_{f,IJ} {\bf{F}}_{n,ij}\tanh(8\dot{\delta^t_{ij}}){\bf{e^t_{ij}}}~; {\bf{F}}_t^r + {\bf{F}}_t^d)
@@ -61,7 +61,16 @@ $k_{t,ij} = $ Tangential Stiffness Constant $= \frac{2}{7} k_{n,ij}$ \cite{hooma
 $\gamma_{t,ij} = $ Tangential Damping Constant $=\frac{2}{7} \gamma_{n,ij}$\cite{canelas_thesis}\\
 $\dot{\delta ^t_{ij}} = $ Rate of Tangential deformation \\
 
-Since this work makes use of the particle approximation of the SPH method, particle overlap in either the normal or the tangential should be given by the same form; $\dot{\delta ^t_{ij}}$, however, was extrapolated from that of $\dot{\delta _{ij}}$. Thus, the values of the  $\delta^t_{ij}$ and $\dot{\delta ^t_{ij}}$ were taken to be equal to $\delta_{ij}$ and $ \vec{\it{v^t_{ij}}}\cdot {\bf{e_{ij}}}$ respectively. Based on the definition, ${\bf{e^t_{ij}}} = \vec{v_{ij}} - \frac{(\vec{v_{ij}} \cdot \vec{F_{n,ij}}) \vec{F_{n,ij}}}{(|\vec{F_{n,ij}}|^2)}$.
+Since this work makes use of the particle approximation of the SPH method, particle overlap during both normal and tangential interaction is assumed to be given by the same form; $\dot{\delta ^t_{ij}}$, however, was extrapolated from that of $\dot{\delta _{ij}}$. Thus, the values of the  $\delta^t_{ij}$ and $\dot{\delta ^t_{ij}}$ were taken to be equal to $\delta_{ij}$ and $ \vec{\it{v^t_{ij}}}\cdot {\bf{e_{ij}}}$ respectively. 
+
+Based on the definition, 
+\begin{eqnarray}
+ {\bf{e^t_{ij}}}            &=& \vec{v_{ij}} - \frac{(\vec{v_{ij}} \cdot \vec{F_{n,ij}}) \vec{F_{n,ij}}}{(|\vec{F_{n,ij}}|^2)} \nonumber\\
+                            &=& \vec{v_{ij}} - \left(\vec{v_{ij}}\cdot\frac{\vec{F_{n,ij}}}{|\vec{F_{n,ij}}|}\right)\frac{\vec{F_{n,ij}}}{|\vec{F_{n,ij}}|} \nonumber\\
+                            &=& \vec{v_{ij}} - \left(\vec{v_{ij}}\cdot{\bf{e_{ij}}}\right){\bf{e_{ij}}}\nonumber\\
+ \therefore {\bf{e^t_{ij}}} &=& \vec{v_{ij}} - \dot{\delta_{ij}}{\bf{e_{ij}}}\nonumber
+\end{eqnarray}
+
 
 \section{PySPH Implementation}
 
@@ -90,15 +99,104 @@ Also, as introduced in section \ref{sec:pysph_abstractions} PySPH has Miscellane
 
 \begin{itemize}
 
-\item \lstinline!loop()!: This method loops over all the destination array particles ``one by one'' (along with the associated nearest neighbours) in each stage of the integrator step thereby allowing all the necessary force computations on each particle to be performed individually. Each loop cycles through all the 
+\item \lstinline!loop()!: This method loops over all the destination array particles ``one by one'' (along with the associated nearest neighbours) in each stage of the integrator step thereby allowing all the necessary force computations on each particle to be performed individually. 
 
-\item \lstinline!post_loop()!: This method ``loops'' over all the destination array particles ``at once'' in each stage of the integrator step thereby allowing manipulations to all the particles after the individual computations are all completed.
+\item \lstinline!post_loop()!: This method loops over all the destination array particles ``at once'' in each stage of the integrator step thereby allowing manipulations to all the particles after the individual computations are all completed.
 \end{itemize}
 
-The \lstinline!loop()! and \lstinline!post_loop()! methods can take specific arguments as dictated by the physics of the problem. These arguments could be pre-fixed with ``\textbf{s\_}'' and ``\textbf{d\_}'' to associate with the source or destination particle properties. Further, general SPH computations make use of many terms which are common across various domains and are provided as ``Pre-computed Symbols''\footnote[10]{\url{http://pysph.readthedocs.io/en/latest/design/overview.html\#writing-the-equations}} to facilitate easy reuse.
+The \lstinline!loop()! and \lstinline!post_loop()! methods can take specific arguments as dictated by the physics of the problem. These arguments could be pre-fixed with ``\textbf{s\_}'' and ``\textbf{d\_}'' to associate with the source or destination particle properties. Further, general SPH computations make use of many terms which are common across various domains and are provided as ``Pre-computed Symbols''\footnote[10]{\url{http://pysph.readthedocs.io/en/latest/design/overview.html\#writing-the-equations}} to facilitate easy reuse; these terms also feature as arguments in the \lstinline!loop()! and \lstinline!post_loop()! methods.
 
 Lastly, as mentioned in Section \ref{sec:pysph_design}, PySPH incorporates Run Time Code Generation (RTCG) to generate C/C++ extensions for all simulations. Therefore, while implementing the model any data structures necessary must be declared such it is parsed and understood by the Cython Code Generator. This can be done by making use of the \lstinline!declare()! function. By default, all explicitly undeclared data structures are treated as pointers to arrays of doubles.
 
 \subsection{Flowchart of DCDEM Implementation}
 
-The flowchart of the implementation is as shown below. 
+The flowchart of the implementation is as shown below.
+$\vspace{0.5cm}$
+
+ \tikzstyle{decision} = [diamond, draw, text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
+ \tikzstyle{block1} = [rectangle, draw, text width=10em, text centered, rounded corners, minimum height=4em]
+ \tikzstyle{block2} = [rectangle, draw, text width=15em, text centered, rounded corners, minimum height=4em]
+ \tikzstyle{line} = [draw, -latex',]
+ \tikzstyle{cloud} = [draw, ellipse, minimum height=2em]
+ \tikzstyle{circle} = [draw, ellipse, minimum height=1em] 
+ \tikzstyle{mytext} = [text width=0.5cm,text centered]
+
+\begin{table} [!htb]
+ \begin{tabular}{ccc}
+  \begin{tikzpicture}[node distance = 2cm]
+    \node [cloud] (start) {start};
+    \node [block1, below of=start] (init) {Call Constructor of Parent Class and Initialize C$_n$};
+    \node [block1, below of=init,node distance=2.5cm] (loop) {Call \lstinline!loop()!\\(with all the\\ necessary parameters)};
+    \node [block1, below of=loop,node distance=2.5cm] (postloop) {Call \lstinline!post_loop()!\\(with all the \\ necessary parameters)};
+    \node [cloud, below of=postloop] (stop) {stop};
+
+    \path [line] (start) -- (init);
+    \path [line] (init) -- (loop);
+    \path [line] (loop) -- (postloop);
+    \path [line] (postloop) -- (stop);
+   \end{tikzpicture} 
+   &$\hspace{0.25cm}$& 
+   \begin{tikzpicture}[node distance = 2cm]
+    \node [cloud] (start) {start};
+    \node [block2, below of=start,yshift=-.35cm] (init) {Declare FNIJ, FTIJ, EIJ, ETIJ as double arrays of size 3;\\ Declare d\_bID, s\_bID as integers and assign to them the ``body\_id'' associated with ``d\_idx'' and ``s\_idx''};
+    \node [decision, below of=init,yshift=-0.5cm] (decide) {d\_bID not equal to s\_bID ? };
+    \node [circle, below of=decide,yshift=-0.5cm] (connector2) {C};
+    \node [block1, right of=decide,xshift=2.75cm] (props) {Obtain properties for ``d\_idx'' and ``s\_idx'' and calculate ${\bf{F_{n,ij}}}$, ${\bf{F_{t,ij}}}$};
+    \node [block1, below of=props,yshift=-0.5cm] (fmag) {Calculate magnitude of Collision Force,\\ Fmag};
+    \node [decision, below of=fmag, text width=7em,yshift=-.25cm] (decide2) {is d\_check\_bit[d\_idx] 0?};
+    \node [block1, left of=decide2,xshift=-2.75cm] (firstIteration) {Set \\ d\_Fmag[d\_bID] = Fmag\\ and\\ d\_Fx[d\_bID], d\_Fy[d\_bID], d\_Fz[d\_bID] with the corresponding components of the Collsion Force};
+    \node [circle, below of=decide2,yshift=-0.75cm] (connector) {A};
+    \node [circle, below of=firstIteration,yshift=-1.5cm] (connector1) {B};
+    
+    \path [line] (start) -- (init);
+    \path [line] (init) -- (decide);
+    \path [line] (decide) -- node [midway, above ] {yes} (props);
+    \path [line] (decide) -- node [left] {no} (connector2);
+    \path [line] (props) -- (fmag);
+    \path [line] (fmag) -- (decide2);
+    \path [line] (decide2) -- node [above ] {yes} (firstIteration);
+    \path [line] (decide2) -- node [left]{no}(connector);
+    \path [line] (firstIteration) -- (connector1);
+   \end{tikzpicture} 
+\\&&\\
+   \lstinline!class DCDEM(Equation)!&&\lstinline!def loop()!
+\end{tabular}
+\end{table}
+
+\newpage
+
+\begin{table} [!htb]
+ \begin{tabular}{ccc}
+  \begin{tikzpicture}[node distance = 2cm]
+    \node [circle] (connector) {A};
+    \node [decision, below of=connector, text width=6em,yshift=-.25cm] (decide2) {is\\ Fmag $>$ d\_Fmag[d\_idx] ?};
+    \node [cloud, right of=decide2,xshift=1.75cm] (stop) {stop};
+    \node [circle,above of=stop] (connector1){B};
+    \node [circle,right of=stop,xshift=-0.25cm] (connector2){C};
+    \node [block1, below of=decide2,yshift=-3cm](remainingIterations){Update \\ d\_Fmag[d\_bID] = Fmag\\ and\\ d\_Fx[d\_bID], d\_Fy[d\_bID], d\_Fz[d\_bID] with the corresponding components of the Collsion Force};
+    
+    \path [line] (connector)--(decide2);
+    \path [line] (connector1)--(stop);
+    \path [line] (connector2)--(stop);
+    \path [line] (decide2)--node[above,midway]{no}(stop);
+    \path [line] (decide2) -- node[left]{yes}(remainingIterations);
+    \path [line] (remainingIterations) -| (stop); 
+  \end{tikzpicture}
+ &$\hspace{0.25cm}$&
+  \begin{tikzpicture}[node distance = 2cm]
+    \node [cloud] (start) {start};
+    \node [block2, below of=start,yshift=-0.25cm] (increment) {Increment the forces \\ acting on each particle.\\ d\_fx[d\_idx] += d\_Fx[d\_bID] \\ d\_fy[d\_idx] += d\_Fy[d\_bID]\\ d\_fz[d\_idx] += d\_Fz[d\_bID]};
+    \node [block2, below of=increment,yshift=-1cm] (reset) {Reset d\_check\_bits and d\_Fx, d\_Fy, d\_Fz};
+    \node [cloud, below of=reset] (stop) {stop};
+    
+    \path [line] (start)--(increment);
+    \path [line] (increment)--(reset);
+    \path [line] (reset)--(stop);
+  \end{tikzpicture}
+ \\&&\\
+ \lstinline!def loop()!&&\lstinline!def post_loop()!
+ \end{tabular}
+\end{table}
+
+Appendix \ref{appendix2} shows the PySPH implementation of the above algorithm.
+ 

@@ -1,0 +1,5 @@
+\chapter{Future Work}
+
+The work presented in this report was largely focussed on getting a physically consistent collision model in place for use within the PySPH framework. This included making a rational choice of the collision model and developing a strategy to implement it in PySPH. However, although literature confirms the verification of the model as laid out by \cite{canelas}, the validity of the PySPH implementation still has to be proven. This is the first task that needs to be addressed in the future.
+
+Further on, once the collision model has been validated, the next task would be to validate a coupled SPH-DCDEM model. Again, the experimental data obtained by \cite{zhang} can be used as a test case. This would then give a complete working scheme to solve Fluid Structure Interaction problems using PySPH. Lastly, another avenue that could be explored is of the coupling of the DCDEM method with the Implicit Incompressible SPH variation of solving SPH equations to give yet another FSI scheme to PySPH users.
