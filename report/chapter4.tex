@@ -13,7 +13,7 @@ This chapter describes a Soft Contact model and it's PySPH implementation. There
 
 \section{Validation of the RigidBodyCollision Model}
 
-This model \cite{gpu_gems}\footnote[8]{\url{http://http.developer.nvidia.com/GPUGems3/gpugems3_ch29.html}} represents the Proof of Concept establishing that DEM can be implemented in PySPH. It models the contacts as a Spring and Dashpot system as follows:
+This model \cite{gpu_gems}\footnote[10]{\url{http://http.developer.nvidia.com/GPUGems3/gpugems3_ch29.html}} represents the Proof of Concept establishing that DEM can be implemented in PySPH. It models the contacts as a Spring and Dashpot system as follows:
 
 \begin{eqnarray}\label{eq:RigidBodyCollision}
 Repulsive Force, f_{i,s} &=& -k~(d-|{\bf{r_{ij}}}|)~\frac{{\bf{r_{ij}}}}{|{\bf{r_{ij}}}|} \nonumber\\
@@ -33,7 +33,7 @@ In order to validate the RigidBodyCollision Model, a comparison with experimenta
 \centering
 \setlength\fboxsep{0pt}
       \includegraphics[scale=0.3]{figures/exp_setup.png} 
-\caption{{\small{Experimental Setup}}}
+\caption{{\small{Experimental Setup (reproduced from \cite{zhang})}}}
 \label{fig:exp_setup}
 \end{figure}
 
@@ -41,17 +41,17 @@ In order to validate the RigidBodyCollision Model, a comparison with experimenta
 \centering
 \setlength\fboxsep{0pt}
       \includegraphics[scale=0.3]{figures/sysEvol.png} 
-\caption{{\small{Evolution of 6 Cylinder Stack}}}
+\caption{{\small{Evolution of 6 Cylinder Stack (reproduced from \cite{zhang})}}}
 \label{fig:sys_state}
 \end{figure}
 
-\begin{figure}[htb!]
+\begin{figure}[!htb]
 \centering
 \setlength\fboxsep{0pt}
        \begin{tabular}{cc}
  	   \includegraphics[scale=0.325]{figures/XexpDataR.png} &\includegraphics[scale=0.325]{figures/YexpDataR.png}
  	   \end{tabular}      
-\caption{{\small{Six Cylinder System Center of Mass (x, y are the center of masses in the X and Y directions)}}}
+\caption{{\small{Six Cylinder System Center of Mass (x, y are the center of masses in the X and Y directions) (reproduced from \cite{zhang})}}}
 \label{fig:sys_cm}
 \end{figure}
 

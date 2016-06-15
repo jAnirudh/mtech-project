@@ -13,7 +13,7 @@ The Distributed Contact Discrete Element Method (DCDEM) \cite{canelas} is a vari
     \includegraphics[width=.69\linewidth]{figures/tangential_interaction.png}
     \caption{{\small{Tangential Interaction}}}
      \end{subfigure}
- \caption{Scheme of DEM Mechanism}
+ \caption{Scheme of DEM Mechanism (reproduced from \cite{canelas})}
  \label{fig:dem_mechanism}
 \end{figure}
 \newpage
@@ -39,7 +39,9 @@ The Stiffness and Damping constants are expressed in terms of the Young's Modulu
 {\raggedright{where,}}\\
 $\frac{1}{E^*} = \frac{1-\nu_I^2}{E_I}+\frac{1-\nu_I^2}{E_I}$ \hspace{0.375cm} ; \hspace{0.375cm} $R^* = \frac{r_i r_j}{r_i + r_j}$ \hspace{0.375cm} ; \hspace{0.375cm} $M^* = \frac{m_I m_J}{m_i + m_j}$\\
 with $C_n$ of the order of $10^{-5}$\\
-
+E$_I$, E$_J =$ Young's Modulus of the I$^{th}$ and J$^{th}$ bodies\\
+$\nu_I$, $\nu_J =$ Poisson's Ratio of the I$^{th}$ and J$^{th}$ bodies\\
+r$_i$, r$_j =\sqrt{x^2+y^2+z^2}$, where $x,y,z$ are the co-ordinates of the i$^{th}$ and j$^{th}$ particles\\
 
 The Tangential Contact Forces are given by a Linear Hertzian model bounded by a modified Coulomb Friction Law; the Coulomb Friction Law is modified by means of a sigmoidal function to account for the discontinuity coming into existence when the tangential velocity of the interacting bodies is zero \cite{vetsch}. The model is given as:
 
@@ -75,7 +77,7 @@ Based on the definition,
 \section{PySPH Implementation}
 
 \subsection{Data Structures and Software Constructs}
-As mentioned in Section \ref{sec:pysph_abstractions}, the particle containers can be given additional properties based on the specific requirements of the problem. These are supplied as a ``constants'' dictionary with the keys as the property names and the values as a numpy array. This mechanism is used to provide physical properties such as Young's Modulus, Poisson's Ratio and Coefficient of Kinetic Friction. Further, since the model requires to calculate ${\bf{e_{ij}}}$, the center of masses of all the entities at the initial state of the system are also provided as constants\footnote[9]{The \lstinline!RigidBodyMoments()! class takes care of the evolution of the system mass centers thereafter}. Additionally, in order to demarcate individual solid bodies, the ``body\_id'' constant array is used. 
+As mentioned in Section \ref{sec:pysph_abstractions}, the particle containers can be given additional properties based on the specific requirements of the problem. These are supplied as a ``constants'' dictionary with the keys as the property names and the values as a numpy array. This mechanism is used to provide physical properties such as Young's Modulus, Poisson's Ratio and Coefficient of Kinetic Friction. Further, since the model requires to calculate ${\bf{e_{ij}}}$, the center of masses of all the entities at the initial state of the system are also provided as constants\footnote[11]{The \lstinline!RigidBodyMoments()! class takes care of the evolution of the system mass centers thereafter}. Additionally, in order to demarcate individual solid bodies, the ``body\_id'' constant array is used. 
 
 The interaction between bodies is divided as ``sources'' and ``destinations'', with the ``sources'' contributing to the overall disturbing force on the system and the  ``destinations'' being subjected to those forces. For implementing the new model, the destinations are additionally equipped with five constant arrays: Fx, Fy, Fz, check\_bit, and Fmag. The roles that these arrays play is listed in Table \ref{tab:dest_array}.
 
@@ -104,13 +106,13 @@ Also, as introduced in section \ref{sec:pysph_abstractions} PySPH has Miscellane
 \item \lstinline!post_loop()!: This method loops over all the destination array particles ``at once'' in each stage of the integrator step thereby allowing manipulations to all the particles after the individual computations are all completed.
 \end{itemize}
 
-The \lstinline!loop()! and \lstinline!post_loop()! methods can take specific arguments as dictated by the physics of the problem. These arguments could be pre-fixed with ``\textbf{s\_}'' and ``\textbf{d\_}'' to associate with the source or destination particle properties. Further, general SPH computations make use of many terms which are common across various domains and are provided as ``Pre-computed Symbols''\footnote[10]{\url{http://pysph.readthedocs.io/en/latest/design/overview.html\#writing-the-equations}} to facilitate easy reuse; these terms also feature as arguments in the \lstinline!loop()! and \lstinline!post_loop()! methods.
+The \lstinline!loop()! and \lstinline!post_loop()! methods can take specific arguments as dictated by the physics of the problem. These arguments could be pre-fixed with ``\textbf{s\_}'' and ``\textbf{d\_}'' to associate with the source or destination particle properties. Further, general SPH computations make use of many terms which are common across various domains and are provided as ``Pre-computed Symbols''\footnote[12]{\url{http://pysph.readthedocs.io/en/latest/design/overview.html\#writing-the-equations}} to facilitate easy reuse; these terms also feature as arguments in the \lstinline!loop()! and \lstinline!post_loop()! methods.
 
-Lastly, as mentioned in Section \ref{sec:pysph_design}, PySPH incorporates Run Time Code Generation (RTCG) to generate C/C++ extensions for all simulations. Therefore, while implementing the model any data structures necessary must be declared such it is parsed and understood by the Cython Code Generator. This can be done by making use of the \lstinline!declare()! function. By default, all explicitly undeclared data structures are treated as pointers to arrays of doubles.
+Lastly, as mentioned in Section \ref{sec:pysph_design}, PySPH incorporates Run Time Code Generation (RTCG) to generate C/C++ extensions for all simulations. Therefore, while implementing the model any data structures necessary must be declared such it is parsed and understood by the Cython Code Generator. This can be done by making use of the \lstinline!declare()! function. By default, all explicitly undeclared variables are considered as doubles.
 
 \subsection{Flowchart of DCDEM Implementation}
 
-The flowchart of the implementation is as shown below.
+The flowchart of the implementation is as shown below. Appendix \ref{appendix2} shows the PySPH implementation of the algorithm. 
 $\vspace{0.5cm}$
 
  \tikzstyle{decision} = [diamond, draw, text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
@@ -140,23 +142,21 @@ $\vspace{0.5cm}$
     \node [cloud] (start) {start};
     \node [block2, below of=start,yshift=-.35cm] (init) {Declare FNIJ, FTIJ, EIJ, ETIJ as double arrays of size 3;\\ Declare d\_bID, s\_bID as integers and assign to them the ``body\_id'' associated with ``d\_idx'' and ``s\_idx''};
     \node [decision, below of=init,yshift=-0.5cm] (decide) {d\_bID not equal to s\_bID ? };
-    \node [circle, below of=decide,yshift=-0.5cm] (connector2) {C};
-    \node [block1, right of=decide,xshift=2.75cm] (props) {Obtain properties for ``d\_idx'' and ``s\_idx'' and calculate ${\bf{F_{n,ij}}}$, ${\bf{F_{t,ij}}}$};
+    \node [circle, below of=decide,yshift=-0.25cm] (connector2) {B};
+    \node [block1, right of=decide,xshift=2.75cm] (props) {Obtain\\ properties for ``d\_idx'' and ``s\_idx'' and calculate ${\bf{F_{n,ij}}}$, ${\bf{F_{t,ij}}}$};
     \node [block1, below of=props,yshift=-0.5cm] (fmag) {Calculate magnitude of Collision Force,\\ Fmag};
-    \node [decision, below of=fmag, text width=7em,yshift=-.25cm] (decide2) {is d\_check\_bit[d\_idx] 0?};
-    \node [block1, left of=decide2,xshift=-2.75cm] (firstIteration) {Set \\ d\_Fmag[d\_bID] = Fmag\\ and\\ d\_Fx[d\_bID], d\_Fy[d\_bID], d\_Fz[d\_bID] with the corresponding components of the Collsion Force};
-    \node [circle, below of=decide2,yshift=-0.75cm] (connector) {A};
-    \node [circle, below of=firstIteration,yshift=-1.5cm] (connector1) {B};
-    
+    \node [circle, below of=fmag,yshift=0.25cm] (connector) {A};
+
     \path [line] (start) -- (init);
     \path [line] (init) -- (decide);
     \path [line] (decide) -- node [midway, above ] {yes} (props);
     \path [line] (decide) -- node [left] {no} (connector2);
     \path [line] (props) -- (fmag);
-    \path [line] (fmag) -- (decide2);
-    \path [line] (decide2) -- node [above ] {yes} (firstIteration);
-    \path [line] (decide2) -- node [left]{no}(connector);
-    \path [line] (firstIteration) -- (connector1);
+    \path [line] (fmag) -- (connector);
+%    \path [line] (fmag) -- (decide2);
+%    \path [line] (decide2) -- node [above ] {yes} (firstIteration);
+%    \path [line] (decide2) -- node [left]{no}(connector);
+%    \path [line] (firstIteration) -- (connector1);
    \end{tikzpicture} 
 \\&&\\
    \lstinline!class DCDEM(Equation)!&&\lstinline!def loop()!
@@ -169,18 +169,22 @@ $\vspace{0.5cm}$
  \begin{tabular}{ccc}
   \begin{tikzpicture}[node distance = 2cm]
     \node [circle] (connector) {A};
-    \node [decision, below of=connector, text width=6em,yshift=-.25cm] (decide2) {is\\ Fmag $>$ d\_Fmag[d\_idx] ?};
-    \node [cloud, right of=decide2,xshift=1.75cm] (stop) {stop};
-    \node [circle,above of=stop] (connector1){B};
-    \node [circle,right of=stop,xshift=-0.25cm] (connector2){C};
-    \node [block1, below of=decide2,yshift=-3cm](remainingIterations){Update \\ d\_Fmag[d\_bID] = Fmag\\ and\\ d\_Fx[d\_bID], d\_Fy[d\_bID], d\_Fz[d\_bID] with the corresponding components of the Collsion Force};
+    \node [decision, below of=connector, text width=7em,yshift=0.25cm] (decide2) {is d\_check\_bit[d\_idx] 0?};
+    \node [block1, left of=decide2,xshift=-2.75cm] (fmag) {Set \\ d\_Fmag[d\_bID] = Fmag\\ and\\ d\_Fx[d\_bID], d\_Fy[d\_bID], d\_Fz[d\_bID] with the corresponding components of the Collsion Force};
+    \node [decision, below of=fmag, text width=6em,yshift=-2cm] (decide3) {is\\ Fmag $>$ d\_Fmag[d\_idx] ?};
+    \node [block1, below of=decide3,yshift=-3cm](remainingIterations){Update \\ d\_Fmag[d\_bID] = Fmag\\ and\\ d\_Fx[d\_bID], d\_Fy[d\_bID], d\_Fz[d\_bID] with the corresponding components of the Collsion Force};
+    \node [cloud, below of= decide2,yshift=-1cm] (stop) {stop};
+    \node [circle,right of=stop] (connector1){B};
     
     \path [line] (connector)--(decide2);
-    \path [line] (connector1)--(stop);
-    \path [line] (connector2)--(stop);
-    \path [line] (decide2)--node[above,midway]{no}(stop);
-    \path [line] (decide2) -- node[left]{yes}(remainingIterations);
-    \path [line] (remainingIterations) -| (stop); 
+    \path [line] (decide2)--node[above,midway]{yes}(fmag);
+    \path [line] (decide2)--node[right,midway]{no}(stop);
+    \path [line] (fmag)--(decide3);
+    \path [line] (decide3)--node[right]{yes}(remainingIterations);
+    \path [line] (decide3)-|node[right]{no}(stop);
+    \path [line] (connector1) -- (stop);
+    \path [line] (remainingIterations) -| (connector1);
+    %\path [line] (connector1) -- (stop); 
   \end{tikzpicture}
  &$\hspace{0.25cm}$&
   \begin{tikzpicture}[node distance = 2cm]
@@ -197,6 +201,3 @@ $\vspace{0.5cm}$
  \lstinline!def loop()!&&\lstinline!def post_loop()!
  \end{tabular}
 \end{table}
-
-Appendix \ref{appendix2} shows the PySPH implementation of the above algorithm.
- 

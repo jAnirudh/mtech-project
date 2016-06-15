@@ -1,11 +1,10 @@
 \chapter{Numerical Methods}
-%
 
 This chapter discusses the Smoothed Particle Hydrodynamics (SPH) and the Discrete Element Method (DEM) numerical methods.
 
 \section{Smoothed Particle Hydrodynamics}
 
-The Smoothed Particle Hydrodynamics (SPH) numerical method was developed in the late 1970s \cite{gingold_monaghan} for tackling problems in Astrophysics which involved arbitrarily moving, three dimensional fluid masses in the absence of boundaries; the equations represented below are discussed in this framework. Since it's inception however, the SPH method has come a long way and has been used in numerous fields such as magneto-hydrodynamics, multi-phase flows, quasi-incompressible flows, gravity currents, flow through porous media, heat conduction, shock simulations, heat transfer and mass flow, explosion phenomenon, high/hyper velocity impact problems etc.
+The Smoothed Particle Hydrodynamics (SPH) numerical method was developed in the late 1970s \cite{gingold_monaghan} for tackling problems in Astrophysics which involved arbitrarily moving, three dimensional fluid masses in the absence of boundaries; the equations represented below are discussed in this framework. Since it's inception however, the SPH method has come a long way and has been used in numerous fields such as magneto-hydrodynamics, multi-phase flows, quasi-incompressible flows, gravity currents, flow through porous media, heat conduction, shock simulations, heat transfer and mass flow, explosion phenomenon, high/hyper velocity impact problems etc. \cite{liu_liu}.
 
 \begin{figure}[htb!]
 \centering
@@ -15,7 +14,7 @@ The Smoothed Particle Hydrodynamics (SPH) numerical method was developed in the 
 \label{fig:particle_representation}
 \end{figure}
 
-The SPH method takes into account the motion of a set of points whose velocity and thermal energy is known at all times. These points are also assigned a mass, and hence, are called as ``Particles''\cite{monaghan_intro}. Thus Domain discretization is achieved by means of a ``Particle Representation'' which describes the fluid domain. Such a representation allows for a completely arbitrary initial distribution of particles, with no explicit requirement of inter-particle connectivity, thereby qualifying SPH to be a Mesh-Free numerical method. Figure ~\ref{fig:particle_representation} shows the domain discretization for a simple incompressible flow problem (the lid-driven cavity) for solving equations with the SPH method and the Finite Volume Method (FVM). The software tools used for generating the representations are PySPH \cite{prabhu_puri} and OpenFOAM respectively.
+The SPH method takes into account the motion of a set of points whose velocity and thermal energy is known at all times. These points are also assigned a mass, and hence, are called as ``Particles''\cite{monaghan_intro}. Thus Domain discretization is achieved by means of a ``Particle Representation'' which describes the fluid domain. Such a representation allows for a completely arbitrary initial distribution of particles, with no explicit requirement of inter-particle connectivity, thereby qualifying SPH to be a Mesh-Free numerical method. Figure ~\ref{fig:particle_representation} shows the domain discretization for a simple incompressible flow problem (the lid-driven cavity) for solving equations with the SPH method and the Finite Volume Method (FVM). The software tools used for generating the representations are PySPH \cite{prabhu_puri} and OpenFOAM \cite{foam} respectively.
 
 Every particle has all the field variables of a Continuum Point Particle associated with it\footnote{``Particles'' are an outcome of the application of SPH on the matter continuum;``Point Particles'' are the basic building blocks of the Continuum approximation.}. The SPH method represents the governing differential equations as a set of difference equations with the dependant and independent variables of the differential equations being related to those ~ of ~ the ~ difference ~ equation ~ by ~ means ~ of ~ a ~``Particle ~ Approximation'' ~ \cite{sph:volieu}\\\cite{liu_liu} detailed below.
 
@@ -51,7 +50,7 @@ Equation \eqref{eq:continuous-approximation} is called the Kernel/Continuous App
 Thereafter, a discrete interpolation is obtained by expressing Equation \ref{eq:continuous-approximation} as a Riemann sum over all the particles falling within the hypersphere, i.e.
 
 \begin{eqnarray} \label{eq:particle-approximation}
-     [A]_{c}(\textbf{r},t) &=& \int_{\varOmega} A(\textbf{r'},t) \textit{w$_h$(\textbf{r - r'})} d^{3}\textbf{r'} \nonumber \\
+     [A]_{c}(\textbf{r},t) &=& \int_{\varOmega_r} A(\textbf{r'},t) \textit{w$_h$(\textbf{r - r'})} d^{3}\textbf{r'} \nonumber \\
      &\approx & \sum_{b}A(\textbf{$\bf{r}_b$},t)~\textit{w$_h$}(\textbf{$|\bf{r}-\bf{r}_b |$}) ~ \textit{V$_b$} = [A]_{d} \nonumber \\
      \therefore [A]_{d} &=& \left( \sum_{b}A(\textbf{$\bf{r}_b$},t)~\textit{w$_h$}(\textbf{$|\bf{r}_{ab} |$}) ~ \textit{V$_b$}\right) ,
      \forall a \in  \varOmega_r , \textbf{r}_{ab} = \textbf{r}_{a} - \textbf{r}_{b}
@@ -74,16 +73,42 @@ This section describes the main properties a kernel function should possess in o
  \begin{eqnarray}\label{eq:kernel-props2}
   \int_{\varOmega_0} \textit{w$_h(\widetilde{r})~ \widetilde{r}~ d^{3}\widetilde{r}$} = 0 
  \end{eqnarray} 
- where ${\varOmega_0}$ is ${\varOmega_r}$ translared to the origin \textbf{0}.
+ where ${\varOmega_0}$ is ${\varOmega_r}$ translated to the origin \textbf{0}.
  
 
- Equation \eqref{eq:kernel-props1} stipulates that the zeroth order moment (i.e. the Mean or the Expectation) of the Kernel be 1, like that of the Dirac $\delta$; \eqref{eq:kernel-props2} stipulates that the first order moment (i.e. the Variance) be zero. 
+ Equation \eqref{eq:kernel-props1} stipulates that the zeroth order moment of the Kernel be 1, like that of the Dirac $\delta$; \eqref{eq:kernel-props2} stipulates that the first order moment (i.e. the Mean or the Expectation) be zero. 
  
  There are various ways in which, mathematically, one could construct functions which satisfy the above two requirements. However, in general, the simplest way to satisfy \eqref{eq:kernel-props2} is by using a Symmetric function (which could be normalized to ensure \eqref{eq:kernel-props1} is satified as well). \newpage This gives us the following relation for the Kernel function:
  
  \begin{eqnarray}\label{eq:kernel-symmetry}
   \textit{w$_h(\widetilde{r}$)} = \textit{w$_h(-\widetilde{r}$)}
  \end{eqnarray}
+
+\subsubsection{Action of Differential Operators}
+
+ Consider the application of the Kernel Approximation of Equation \eqref{eq:continuous-approximation} of the gradient of a scalar field as given below \cite{sph:volieu}: 
+ 
+ \begin{eqnarray} \label{eq:diff_operator}
+ \left[\textbf{grad}~A\right]_{c}(\textbf{r},t) &=& \int_{\varOmega_r} \frac{\partial A(\textbf{r'},t)}{\partial \textbf{r'}} \textit{w$_h$(\textbf{r - r'})} d^{3}\textbf{r'} \nonumber\\
+ &=& \int_{\varOmega_r} \frac{\partial}{\partial \textbf{r'}}\left[A(\textbf{r'},t) \textit{w$_h$(\textbf{r - r'})} \right]d^{3}\textbf{r'} \\
+ &-& \int_{\varOmega_r} A(\textbf{r'},t) \frac{\partial w_h(\textbf{r - r'}) }{\partial \textbf{r'}} d^{3}\textbf{r'} \nonumber
+ \end{eqnarray}
+ 
+ The first term of Equation \eqref{eq:diff_operator} can be expressed in terms of a surface integral by applying Guass' Divergence Theorem which vanishes in the bulk of the fluid in the absence of any boundaries \cite{sph:volieu}. 
+ 
+ The second term can be expressed as $$\int_{\varOmega_r} A(\textbf{r'},t) \frac{\partial w_h(\textbf{r - r'}) }{\partial \textbf{r}} d^{3}\textbf{r'}$$ by making use of the identity $$\frac{\partial w_h(\textbf{r - r'}) }{\partial \textbf{r'}} = -\frac{\partial w_h(\textbf{r - r'}) }{\partial \textbf{r}}$$
+ 
+ Hence, we have 
+ \begin{eqnarray}\label{eq:grad}
+ \left[\textbf{grad}~A\right]_{c}(\textbf{r},t) = \int_{\varOmega_r} A(\textbf{r'},t) \frac{\partial w_h(\textbf{r - r'}) }{\partial \textbf{r}} d^{3}\textbf{r'} = \int_{\varOmega_r} A(\textbf{r'},t) ~\nabla\left[w_h(\textbf{r - r'})\right] d^{3}\textbf{r'} 
+ \end{eqnarray}  
+ 
+ Analogously, the following relation can be obtained, 
+ \begin{eqnarray}\label{eq:div}
+ \left[\textbf{div}~A\right]_{c}(\textbf{r},t) =  \int_{\varOmega_r} A(\textbf{r'},t) \cdot ~\nabla \left[w_h(\textbf{r - r'})\right] d^{3}\textbf{r'} 
+ \end{eqnarray}
+ 
+ Finally, by applying the Particle approximation, we can express the Equations \eqref{eq:grad} and \eqref{eq:div} as Riemann Sums much like those given by Equation \eqref{eq:particle-approximation} to obtain algebraic expressions for solving simultaneously.
 
 \section{Discrete Element Method} \label{sec:DEM}
 
